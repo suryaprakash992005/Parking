@@ -12,48 +12,48 @@ export default function Sidebar() {
   const activeTab = searchParams.get('tab') || 'overview';
 
   const userItems = [
-    { id: 'overview', name: 'Dashboard', icon: LayoutDashboard },
+    { id: 'overview', name: 'Overview', icon: LayoutDashboard },
     { id: 'search-redirect', name: 'Search Parking', icon: Search, link: '/search' },
-    { id: 'bookings', name: 'My Bookings', icon: CalendarDays },
-    { id: 'history', name: 'Booking History', icon: History },
+    { id: 'bookings', name: 'Active Bookings', icon: CalendarDays },
+    { id: 'history', name: 'Usage Logs', icon: History },
     { id: 'saved', name: 'Saved Locations', icon: MapPin },
-    { id: 'profile', name: 'Profile', icon: User },
-    { id: 'payments', name: 'Payment History', icon: CreditCard },
-    { id: 'support', name: 'Support', icon: LifeBuoy }
+    { id: 'profile', name: 'Identity Profile', icon: User },
+    { id: 'payments', name: 'Payments Ledger', icon: CreditCard },
+    { id: 'support', name: 'Help Desk', icon: LifeBuoy }
   ];
 
   const ownerItems = [
-    { id: 'overview', name: 'Overview', icon: LayoutDashboard },
-    { id: 'lots', name: 'Manage Lots', icon: Building },
-    { id: 'add-slot', name: 'Add Parking Slot', icon: PlusCircle },
-    { id: 'bookings', name: 'Current Bookings', icon: CalendarDays },
-    { id: 'analytics', name: 'Revenue Analytics', icon: BarChart3 },
-    { id: 'customers', name: 'Customers', icon: Users },
-    { id: 'notifications', name: 'Notifications', icon: Bell },
-    { id: 'settings', name: 'Settings', icon: Settings }
+    { id: 'overview', name: 'Operational Overview', icon: LayoutDashboard },
+    { id: 'lots', name: 'Inventory Assets', icon: Building },
+    { id: 'add-slot', name: 'Configure Bay', icon: PlusCircle },
+    { id: 'bookings', name: 'Active Accesses', icon: CalendarDays },
+    { id: 'analytics', name: 'Revenue Streams', icon: BarChart3 },
+    { id: 'customers', name: 'Customer Base', icon: Users },
+    { id: 'notifications', name: 'Security Logs', icon: Bell },
+    { id: 'settings', name: 'Console Config', icon: Settings }
   ];
 
   const adminItems = [
-    { id: 'overview', name: 'Overview', icon: LayoutDashboard },
-    { id: 'users', name: 'Manage Users', icon: Users },
-    { id: 'verify', name: 'Verify Partners', icon: ShieldCheck },
-    { id: 'bookings', name: 'All Bookings', icon: CalendarDays },
-    { id: 'revenue', name: 'Commissions & Rev', icon: BarChart3 },
-    { id: 'fraud', name: 'Fraud Control', icon: ShieldAlert }
+    { id: 'overview', name: 'Platform Health', icon: LayoutDashboard },
+    { id: 'users', name: 'User Directories', icon: Users },
+    { id: 'verify', name: 'Partner Approvals', icon: ShieldCheck },
+    { id: 'bookings', name: 'All Transactions', icon: CalendarDays },
+    { id: 'revenue', name: 'Commissions', icon: BarChart3 },
+    { id: 'fraud', name: 'Security Center', icon: ShieldAlert }
   ];
 
   const items = role === 'admin' ? adminItems : role === 'owner' ? ownerItems : userItems;
 
   const handleTabChange = (item) => {
-    if (item.link) return; // Managed by Router Link
+    if (item.link) return;
     setSearchParams({ tab: item.id });
   };
 
   return (
-    <div className="w-full md:w-64 border-r border-gray-800 bg-gray-950 p-4 flex flex-col gap-1 min-h-[calc(100vh-4rem)]">
-      <div className="mb-4 px-3 py-2">
-        <h2 className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
-          Navigation ({role.toUpperCase()})
+    <div className="w-full md:w-60 border-r border-neutral-900 bg-neutral-950 p-4 flex flex-col gap-1 min-h-[calc(100vh-3.5rem)]">
+      <div className="mb-4 px-3.5 py-2">
+        <h2 className="text-[9px] font-extrabold uppercase tracking-widest text-neutral-500">
+          Workplace / {role.toUpperCase()}
         </h2>
       </div>
 
@@ -67,9 +67,9 @@ export default function Sidebar() {
               <Link
                 key={item.id}
                 to={item.link}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold text-gray-400 hover:bg-gray-900 hover:text-white transition-all duration-200"
+                className="flex items-center gap-3 rounded-lg px-3.5 py-2 text-[11px] font-semibold text-neutral-400 hover:bg-neutral-900/50 hover:text-white transition-all"
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-4 w-4 stroke-[1.8]" />
                 <span className="whitespace-nowrap">{item.name}</span>
               </Link>
             );
@@ -79,13 +79,13 @@ export default function Sidebar() {
             <button
               key={item.id}
               onClick={() => handleTabChange(item)}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold transition-all duration-200 ${
+              className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-[11px] font-semibold transition-all cursor-pointer ${
                 isActive 
-                  ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20' 
-                  : 'text-gray-400 hover:bg-gray-900 hover:text-white border border-transparent'
+                  ? 'bg-neutral-900 text-white border border-neutral-800' 
+                  : 'text-neutral-400 hover:bg-neutral-900/50 hover:text-white border border-transparent'
               }`}
             >
-              <Icon className={`h-4 w-4 ${isActive ? 'text-blue-500' : 'text-gray-400'}`} />
+              <Icon className={`h-4 w-4 stroke-[1.8] ${isActive ? 'text-white' : 'text-neutral-500'}`} />
               <span className="whitespace-nowrap">{item.name}</span>
             </button>
           );

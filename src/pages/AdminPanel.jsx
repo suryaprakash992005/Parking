@@ -3,8 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import Sidebar from '../components/Sidebar';
 import { 
-  ShieldCheck, ShieldAlert, BarChart3, CalendarDays, Users, Check,
-  AlertTriangle, DollarSign, Ban, Trash2, Landmark, RefreshCw
+  ShieldCheck, ShieldAlert, Check, AlertTriangle
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 
@@ -20,14 +19,7 @@ export default function AdminPanel() {
     { id: 3, type: 'Invalid Access', message: 'Gate barrier attempted force bypass without scan.', target: 'Downtown Smart Haven', severity: 'Critical', timestamp: '1 hr ago' }
   ]);
 
-  // Derived datasets
-  const pendingLots = useMemo(() => {
-    return parkingLots.filter(lot => !lot.verified);
-  }, [parkingLots]);
-
-  const verifiedLots = useMemo(() => {
-    return parkingLots.filter(lot => lot.verified);
-  }, [parkingLots]);
+  const pendingLots = useMemo(() => parkingLots.filter(lot => !lot.verified), [parkingLots]);
 
   // Aggregated analytics
   const adminStats = useMemo(() => {
@@ -63,81 +55,80 @@ export default function AdminPanel() {
     setFraudAlerts(prev => prev.filter(alert => alert.id !== id));
   };
 
-  // Tab: Overview
   const renderOverview = () => {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         
         {/* Metric panels */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="rounded-2xl border border-gray-850 bg-gray-900/30 p-5">
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Gross Booking Value</span>
-            <div className="text-2xl font-bold text-white mt-1">₹{adminStats.grossValue + 870000}</div>
-            <div className="text-[10px] text-emerald-400 font-semibold mt-1.5">+24% vs last quarter</div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-1">
+            <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest">Gross Transaction Value</span>
+            <div className="text-xl font-bold text-white font-outfit">₹{adminStats.grossValue + 870000}</div>
+            <div className="text-[10px] text-neutral-500">+24% vs last quarter</div>
           </div>
-          <div className="rounded-2xl border border-gray-850 bg-gray-900/30 p-5">
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Platform Take-rate (15%)</span>
-            <div className="text-2xl font-bold text-blue-400 mt-1">₹{adminStats.platformRevenue + 130500}</div>
-            <div className="text-[10px] text-gray-555 mt-1.5">Net platform commission</div>
+          <div className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-1">
+            <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest">Commission Revenue (15%)</span>
+            <div className="text-xl font-bold text-white font-outfit">₹{adminStats.platformRevenue + 130500}</div>
+            <div className="text-[10px] text-neutral-500">Net platform margins</div>
           </div>
-          <div className="rounded-2xl border border-gray-850 bg-gray-900/30 p-5">
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Partner Sites</span>
-            <div className="text-2xl font-bold text-white mt-1">{adminStats.partnersCount} lots</div>
-            <div className="text-[10px] text-amber-500 font-semibold mt-1.5">{pendingLots.length} pending review</div>
+          <div className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-1">
+            <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest">Listed Infrastructure</span>
+            <div className="text-xl font-bold text-white font-outfit">{adminStats.partnersCount} Lots</div>
+            <div className="text-[10px] text-neutral-500">{pendingLots.length} awaiting verification</div>
           </div>
-          <div className="rounded-2xl border border-gray-850 bg-gray-900/30 p-5">
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Fraud Threat Level</span>
-            <div className="text-2xl font-bold text-rose-500 mt-1 flex items-center gap-1.5">
-              <ShieldAlert className="h-5 w-5" /> Normal
+          <div className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-1">
+            <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest">Security Level</span>
+            <div className="text-xl font-bold text-white font-outfit flex items-center gap-1.5">
+              <ShieldAlert className="h-4.5 w-4.5 text-neutral-400" /> Normal
             </div>
-            <div className="text-[10px] text-gray-500 mt-1.5">{fraudAlerts.length} active alerts</div>
+            <div className="text-[10px] text-neutral-500">{fraudAlerts.length} unresolved alerts</div>
           </div>
         </div>
 
-        {/* Core graphs */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Core graphs & Verification sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          <div className="lg:col-span-8 rounded-2xl border border-gray-850 bg-gray-900/30 p-5">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-sm font-semibold text-white">Monthly Platform Commission Revenue ($)</h3>
-              <span className="text-[10px] font-bold text-gray-500 uppercase">H1 Growth Profile</span>
+          <div className="lg:col-span-8 rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400">Commission Margins</h3>
+              <span className="text-[9px] font-mono text-neutral-500 uppercase">H1 distribution</span>
             </div>
-            <div className="h-60 w-full">
+            <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyGrowthData}>
-                  <XAxis dataKey="month" stroke="#6b7280" fontSize={10} tickLine={false} />
-                  <YAxis stroke="#6b7280" fontSize={10} tickLine={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151' }} />
-                  <Bar dataKey="commission" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                  <XAxis dataKey="month" stroke="#525252" fontSize={10} tickLine={false} />
+                  <YAxis stroke="#525252" fontSize={10} tickLine={false} />
+                  <Tooltip contentStyle={{ backgroundColor: '#0a0a0a', border: '1px solid #262626' }} />
+                  <Bar dataKey="commission" fill="#404040" radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* Pending lots sidebar */}
-          <div className="lg:col-span-4 rounded-2xl border border-gray-850 bg-gray-900/30 p-5 space-y-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400">Verifications</h3>
+          <div className="lg:col-span-4 rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400">Pending Approvals</h3>
             {pendingLots.length === 0 ? (
-              <p className="text-xs text-gray-500 py-6 text-center">No pending partner lot submissions.</p>
+              <p className="text-xs text-neutral-500 py-6 text-center">No pending partner lot submissions.</p>
             ) : (
               <div className="space-y-3">
                 {pendingLots.map(lot => (
-                  <div key={lot.id} className="rounded-xl border border-gray-850 bg-gray-950 p-3.5 space-y-3">
+                  <div key={lot.id} className="rounded border border-neutral-900 bg-neutral-950 p-4 space-y-3">
                     <div>
-                      <span className="font-semibold text-xs text-white block">{lot.name}</span>
-                      <span className="text-[10px] text-gray-500 block mt-0.5">{lot.address}</span>
+                      <span className="font-bold text-xs text-white block">{lot.name}</span>
+                      <span className="text-[10px] text-neutral-500 block mt-0.5">{lot.address}</span>
                     </div>
 
                     <div className="flex gap-2 justify-end pt-1">
                       <button
                         onClick={() => verifyParkingLot(lot.id)}
-                        className="flex items-center gap-1 rounded bg-emerald-500/10 border border-emerald-500/30 px-2 py-1 text-[10px] font-semibold text-emerald-400"
+                        className="flex items-center gap-1 rounded bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 px-3 py-1.5 text-[10px] font-bold text-white cursor-pointer"
                       >
                         <Check className="h-3 w-3" /> Approve
                       </button>
                       <button
                         onClick={() => deleteParkingLot(lot.id)}
-                        className="flex items-center gap-1 rounded bg-rose-500/10 border border-rose-500/30 px-2 py-1 text-[10px] font-semibold text-rose-400"
+                        className="rounded border border-neutral-900 px-3 py-1.5 text-[10px] font-bold text-neutral-400 hover:text-white cursor-pointer"
                       >
                         Reject
                       </button>
@@ -154,40 +145,39 @@ export default function AdminPanel() {
     );
   };
 
-  // Tab: Verify Partners
   const renderVerify = () => {
     return (
       <div className="space-y-6">
-        <h3 className="font-outfit text-lg font-bold">Partner Verification System</h3>
-        <div className="rounded-2xl border border-gray-850 bg-gray-900/20 overflow-hidden">
+        <h3 className="text-xs font-extrabold uppercase tracking-widest text-neutral-450">Partner Audit System</h3>
+        <div className="rounded-xl border border-neutral-900 bg-neutral-950 overflow-hidden shadow-2xl">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-gray-950 border-b border-gray-850 text-gray-400">
-                <th className="p-4">Lot Name</th>
-                <th className="p-4">Location</th>
-                <th className="p-4">Total Spaces</th>
-                <th className="p-4">Pricing</th>
-                <th className="p-4">Verification</th>
+              <tr className="bg-neutral-900/60 border-b border-neutral-900 text-neutral-505 font-extrabold uppercase tracking-wider text-[9px]">
+                <th className="p-4">Facility Designation</th>
+                <th className="p-4">Coordinates</th>
+                <th className="p-4">Bays</th>
+                <th className="p-4">Price / Hour</th>
+                <th className="p-4">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-850">
+            <tbody className="divide-y divide-neutral-900 text-neutral-300">
               {parkingLots.map(lot => (
-                <tr key={lot.id} className="hover:bg-gray-900/10">
-                  <td className="p-4 font-semibold text-white">{lot.name}</td>
-                  <td className="p-4 text-gray-400">{lot.address}</td>
-                  <td className="p-4 font-mono">{lot.slots.length}</td>
-                  <td className="p-4 font-mono">₹{lot.price}/hr</td>
+                <tr key={lot.id} className="hover:bg-neutral-900/10">
+                  <td className="p-4 font-bold text-white">{lot.name}</td>
+                  <td className="p-4 text-neutral-550">{lot.address}</td>
+                  <td className="p-4 font-mono text-[11px]">{lot.slots.length}</td>
+                  <td className="p-4 font-mono text-[11px]">₹{lot.price}/hr</td>
                   <td className="p-4">
                     {lot.verified ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 text-[9px] font-bold text-emerald-400 uppercase">
-                        <Check className="h-2.5 w-2.5" /> Approved
+                      <span className="inline-flex items-center gap-1 rounded border border-neutral-800 bg-neutral-900 px-2.5 py-0.5 text-[9px] font-bold text-neutral-400 uppercase">
+                        Approved
                       </span>
                     ) : (
                       <button
                         onClick={() => verifyParkingLot(lot.id)}
-                        className="rounded bg-blue-600 px-2.5 py-1 text-[10px] font-semibold hover:bg-blue-500 transition-colors"
+                        className="rounded bg-white text-black px-2.5 py-1 text-[10px] font-bold hover:bg-neutral-200 transition-all cursor-pointer"
                       >
-                        Click to Approve
+                        Approve listing
                       </button>
                     )}
                   </td>
@@ -200,48 +190,45 @@ export default function AdminPanel() {
     );
   };
 
-  // Tab: Fraud Control
   const renderFraud = () => {
     return (
       <div className="max-w-3xl space-y-6">
-        <div className="flex justify-between items-center">
-          <h3 className="font-outfit text-lg font-bold">Fraud Detection Center</h3>
-          <span className="rounded bg-rose-500/20 border border-rose-500/40 px-2 py-0.5 text-[9px] font-bold text-rose-400 uppercase">
-            Live Feed Active
-          </span>
+        <div className="flex justify-between items-center border-b border-neutral-900 pb-3">
+          <h3 className="text-xs font-extrabold uppercase tracking-widest text-neutral-400">Security & Flagged Signals</h3>
+          <span className="text-[9px] font-mono text-neutral-500 uppercase">Telemetry stream active</span>
         </div>
 
         <div className="space-y-4">
           {fraudAlerts.length === 0 ? (
-            <p className="text-xs text-gray-500 bg-gray-900/10 border border-gray-850 rounded-2xl p-8 text-center">
-              All systems nominal. No fraud events detected.
+            <p className="text-xs text-neutral-500 bg-neutral-950 border border-neutral-900 rounded-xl p-8 text-center">
+              All infrastructure nodes reporting nominal status. No warnings.
             </p>
           ) : (
             fraudAlerts.map(alert => (
-              <div key={alert.id} className="rounded-2xl border border-rose-500/20 bg-rose-950/10 p-5 flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  <div className="h-9 w-9 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0">
-                    <AlertTriangle className="h-5 w-5" />
+              <div key={alert.id} className="rounded-xl border border-neutral-900 bg-neutral-950 p-5 flex items-start justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="h-9 w-9 rounded bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400 shrink-0">
+                    <AlertTriangle className="h-4.5 w-4.5" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-xs text-white">{alert.type}</span>
-                      <span className="text-[8px] font-bold uppercase px-1.5 py-0.2 bg-rose-600 rounded text-white font-mono">
+                      <span className="font-bold text-xs text-white uppercase tracking-wider">{alert.type}</span>
+                      <span className="text-[8px] font-mono font-bold uppercase px-1.5 py-0.2 border border-neutral-800 bg-neutral-900 rounded text-neutral-400">
                         {alert.severity}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">{alert.message}</p>
-                    <div className="text-[10px] text-gray-500 mt-2 font-mono">
-                      Target: {alert.target} • Timestamp: {alert.timestamp}
+                    <p className="text-xs text-neutral-400 mt-2 leading-relaxed">{alert.message}</p>
+                    <div className="text-[10px] text-neutral-550 mt-3 font-mono">
+                      Target: {alert.target} • Signal: {alert.timestamp}
                     </div>
                   </div>
                 </div>
 
                 <button
                   onClick={() => handleDismissFraud(alert.id)}
-                  className="rounded-lg bg-gray-900 border border-gray-800 hover:border-gray-700 px-3 py-1.5 text-xs text-gray-400 hover:text-white"
+                  className="rounded border border-neutral-800 hover:border-neutral-700 bg-neutral-900 px-3 py-1.5 text-xs font-bold text-neutral-400 hover:text-white cursor-pointer"
                 >
-                  Dismiss Alert
+                  Clear Flag
                 </button>
               </div>
             ))
@@ -251,41 +238,34 @@ export default function AdminPanel() {
     );
   };
 
-  // Tab: Bookings
   const renderBookings = () => {
     return (
       <div className="space-y-4">
-        <h3 className="font-outfit text-lg font-bold">All Platform Bookings</h3>
-        <div className="rounded-2xl border border-gray-850 bg-gray-900/20 overflow-hidden">
+        <h3 className="text-xs font-extrabold uppercase tracking-widest text-neutral-450">All Platform Ledger Logs</h3>
+        <div className="rounded-xl border border-neutral-900 bg-neutral-950 overflow-hidden shadow-2xl">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-gray-950 border-b border-gray-850 text-gray-400">
-                <th className="p-4">Ticket</th>
-                <th className="p-4">Parking Lot</th>
+              <tr className="bg-neutral-900/60 border-b border-neutral-900 text-neutral-505 font-extrabold uppercase tracking-wider text-[9px]">
+                <th className="p-4">Transaction</th>
+                <th className="p-4">Facility</th>
                 <th className="p-4">Bay</th>
                 <th className="p-4">Schedule</th>
-                <th className="p-4">Gross Amt</th>
-                <th className="p-4">Commission</th>
+                <th className="p-4">Gross Vol</th>
+                <th className="p-4">Platform Fee (15%)</th>
                 <th className="p-4">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-850">
+            <tbody className="divide-y divide-neutral-900 text-neutral-300">
               {bookings.map(b => (
-                <tr key={b.id} className="hover:bg-gray-900/10">
-                  <td className="p-4 font-mono font-semibold">{b.id.toUpperCase()}</td>
-                  <td className="p-4 text-white">{b.lotName}</td>
-                  <td className="p-4 font-mono">{b.slotId}</td>
-                  <td className="p-4 text-gray-400">{b.date} • {b.time}</td>
+                <tr key={b.id} className="hover:bg-neutral-900/10">
+                  <td className="p-4 font-mono text-[11px] font-bold">{b.id.toUpperCase()}</td>
+                  <td className="p-4 text-white font-bold">{b.lotName}</td>
+                  <td className="p-4 font-mono text-[11px]">{b.slotId}</td>
+                  <td className="p-4 text-neutral-550">{b.date} • {b.time}</td>
                   <td className="p-4 text-white font-bold">₹{b.amount}</td>
-                  <td className="p-4 text-purple-400 font-bold">₹{(b.amount * 0.15).toFixed(2)}</td>
+                  <td className="p-4 text-neutral-400 font-bold">₹{(b.amount * 0.15).toFixed(2)}</td>
                   <td className="p-4">
-                    <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${
-                      b.status === 'Upcoming' 
-                        ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20' 
-                        : b.status === 'Completed' 
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                          : 'bg-gray-800 text-gray-500'
-                    }`}>
+                    <span className="rounded border border-neutral-800 bg-neutral-900 px-2 py-0.5 text-[9px] font-extrabold tracking-wider uppercase text-neutral-450">
                       {b.status}
                     </span>
                   </td>
@@ -309,14 +289,14 @@ export default function AdminPanel() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row bg-gray-950 text-white min-h-screen">
+    <div className="flex flex-col md:flex-row bg-[#0A0A0A] text-white min-h-screen">
       <Sidebar />
       <main className="flex-1 p-6 md:p-8">
         
-        <div className="border-b border-gray-900 pb-5 mb-6 flex justify-between items-center">
+        <div className="border-b border-neutral-900 pb-5 mb-8 flex justify-between items-center">
           <div>
-            <h2 className="font-outfit text-2xl font-bold capitalize">Platform Admin</h2>
-            <p className="text-xs text-gray-550 mt-1">Super-admin console for commission analytics, fraud feeds, and partner audits.</p>
+            <h2 className="font-outfit text-xl font-bold uppercase tracking-wider">Infrastructure Operations Tower</h2>
+            <p className="text-xs text-neutral-500 mt-1">Audit platform take-rates, verify commercial space hosts, and dismiss security alerts.</p>
           </div>
         </div>
 

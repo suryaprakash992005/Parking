@@ -5,25 +5,24 @@ import Sidebar from '../components/Sidebar';
 import { 
   Building, PlusCircle, BarChart3, CalendarDays, Users, Bell,
   Settings, DollarSign, Activity, Percent, ToggleLeft, ShieldCheck,
-  CheckCircle, Plus, Eye, Edit2, AlertCircle, RefreshCw, Star
+  CheckCircle, Plus, Eye, Edit2, AlertCircle, RefreshCw, Star, ArrowUpRight
 } from 'lucide-react';
 import { 
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip,
-  BarChart, Bar, CartesianGrid, Legend
+  BarChart, Bar
 } from 'recharts';
 
 export default function OwnerDashboard() {
-  const { parkingLots, bookings, addParkingLot, updateSlotStatus, verifyParkingLot } = useApp();
+  const { parkingLots, bookings, addParkingLot, updateSlotStatus } = useApp();
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'overview';
 
-  // Owner Mock Identity (owner-1 manages Downown Smart Haven and Plaza Covered Deck)
   const OWNER_ID = 'owner-1';
 
   // State: Add Lot Form
   const [newLotName, setNewLotName] = useState('');
   const [newLotAddress, setNewLotAddress] = useState('');
-  const [newLotPrice, setNewLotPrice] = useState(4.00);
+  const [newLotPrice, setNewLotPrice] = useState(120);
   const [newLotSlots, setNewLotSlots] = useState(8);
   const [newLotFeatures, setNewLotFeatures] = useState({
     covered: true,
@@ -41,10 +40,7 @@ export default function OwnerDashboard() {
   const [slotSuccessMsg, setSlotSuccessMsg] = useState('');
 
   // Derived datasets
-  const myLots = useMemo(() => {
-    return parkingLots.filter(lot => lot.ownerId === OWNER_ID);
-  }, [parkingLots]);
-
+  const myLots = useMemo(() => parkingLots.filter(lot => lot.ownerId === OWNER_ID), [parkingLots]);
   const myBookings = useMemo(() => {
     const lotIds = myLots.map(l => l.id);
     return bookings.filter(b => lotIds.includes(b.lotId));
@@ -84,15 +80,14 @@ export default function OwnerDashboard() {
     };
   }, [myLots, myBookings]);
 
-  // Chart datasets
   const revenueChartData = [
-    { name: 'Mon', revenue: 120 },
-    { name: 'Tue', revenue: 190 },
-    { name: 'Wed', revenue: 150 },
-    { name: 'Thu', revenue: 240 },
-    { name: 'Fri', revenue: 310 },
-    { name: 'Sat', revenue: 420 },
-    { name: 'Sun', revenue: 380 }
+    { name: 'Mon', revenue: 1400 },
+    { name: 'Tue', revenue: 2100 },
+    { name: 'Wed', revenue: 1800 },
+    { name: 'Thu', revenue: 2900 },
+    { name: 'Fri', revenue: 3200 },
+    { name: 'Sat', revenue: 4600 },
+    { name: 'Sun', revenue: 4100 }
   ];
 
   const occupancyTrendData = [
@@ -105,7 +100,6 @@ export default function OwnerDashboard() {
     { time: '20:00', rate: 45 }
   ];
 
-  // Handlers
   const handleCreateLotSubmit = (e) => {
     e.preventDefault();
     if (!newLotName.trim() || !newLotAddress.trim()) return;
@@ -122,7 +116,7 @@ export default function OwnerDashboard() {
 
     setNewLotName('');
     setNewLotAddress('');
-    setLotSuccessMsg('New parking lot listed successfully! Awaiting verification.');
+    setLotSuccessMsg('Facility inventory listed. Awaiting gateway validation.');
     setTimeout(() => setLotSuccessMsg(''), 4000);
   };
 
@@ -130,77 +124,73 @@ export default function OwnerDashboard() {
     e.preventDefault();
     if (!newSlotLabel.trim()) return;
 
-    // Simulate adding slot to list in state
     updateSlotStatus(selectedLotId, newSlotLabel, 'Available');
     setNewSlotLabel('');
-    setSlotSuccessMsg(`Slot ${newSlotLabel} created successfully!`);
+    setSlotSuccessMsg(`Bay ${newSlotLabel} registered.`);
     setTimeout(() => setSlotSuccessMsg(''), 4000);
   };
 
-  // Tab: Overview
   const renderOverview = () => {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         
         {/* Metric Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="rounded-2xl border border-gray-850 bg-gray-900/30 p-5">
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Weekly Revenue</span>
-            <div className="text-2xl font-bold text-emerald-450 mt-1">₹{metrics.revenue + 45000}</div>
-            <div className="text-[10px] text-emerald-400 font-semibold mt-1.5 flex items-center gap-1">
-              <TrendingUp className="h-3 w-3" /> +18.4% vs last week
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-1">
+            <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest">Aggregate Earnings</span>
+            <div className="text-xl font-bold text-white font-outfit">₹{metrics.revenue + 45000}</div>
+            <div className="text-[10px] text-neutral-500 flex items-center gap-1">
+              <ArrowUpRight className="h-3.5 w-3.5 text-neutral-550" /> +18.4% vs last week
             </div>
           </div>
-          <div className="rounded-2xl border border-gray-850 bg-gray-900/30 p-5">
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Active Bookings</span>
-            <div className="text-2xl font-bold text-white mt-1">{metrics.activeBookings}</div>
-            <div className="text-[10px] text-gray-500 mt-1.5">Scheduled spot access</div>
+          <div className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-1">
+            <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest">Active Accesses</span>
+            <div className="text-xl font-bold text-white font-outfit">{metrics.activeBookings}</div>
+            <div className="text-[10px] text-neutral-500">Live check-ins</div>
           </div>
-          <div className="rounded-2xl border border-gray-850 bg-gray-900/30 p-5">
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Occupancy Rate</span>
-            <div className="text-2xl font-bold text-blue-400 mt-1">{metrics.occupancyRate}%</div>
-            <div className="text-[10px] text-gray-500 mt-1.5">Average slots filled</div>
+          <div className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-1">
+            <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest">Occupancy Coefficient</span>
+            <div className="text-xl font-bold text-white font-outfit">{metrics.occupancyRate}%</div>
+            <div className="text-[10px] text-neutral-500">Bays filled average</div>
           </div>
-          <div className="rounded-2xl border border-gray-850 bg-gray-900/30 p-5">
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Empty Spaces</span>
-            <div className="text-2xl font-bold text-white mt-1">{metrics.freeSlots} slots</div>
-            <div className="text-[10px] text-gray-500 mt-1.5">Out of {metrics.totalSlots} total bays</div>
+          <div className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-1">
+            <span className="text-[9px] text-neutral-500 font-bold uppercase tracking-widest">Bays Vacant</span>
+            <div className="text-xl font-bold text-white font-outfit">{metrics.freeSlots} slots</div>
+            <div className="text-[10px] text-neutral-500">Out of {metrics.totalSlots} total units</div>
           </div>
         </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Revenue chart */}
-          <div className="rounded-2xl border border-gray-850 bg-gray-900/30 p-5">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-sm font-semibold text-white">Daily Revenue Flow ($)</h3>
-              <span className="text-[10px] font-bold text-gray-500 uppercase">Weekly View</span>
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400">Earnings Yield</h3>
+              <span className="text-[9px] font-mono text-neutral-500 uppercase">Weekly metrics</span>
             </div>
-            <div className="h-60 w-full">
+            <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={revenueChartData}>
-                  <XAxis dataKey="name" stroke="#6b7280" fontSize={10} tickLine={false} />
-                  <YAxis stroke="#6b7280" fontSize={10} tickLine={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151' }} />
-                  <Bar dataKey="revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  <XAxis dataKey="name" stroke="#525252" fontSize={10} tickLine={false} />
+                  <YAxis stroke="#525252" fontSize={10} tickLine={false} />
+                  <Tooltip contentStyle={{ backgroundColor: '#0a0a0a', border: '1px solid #262626' }} />
+                  <Bar dataKey="revenue" fill="#404040" radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Occupancy Chart */}
-          <div className="rounded-2xl border border-gray-850 bg-gray-900/30 p-5">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-sm font-semibold text-white">Occupancy Distribution Curve (%)</h3>
-              <span className="text-[10px] font-bold text-gray-500 uppercase">Hourly Peak</span>
+          <div className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-400">Occupancy Peak</h3>
+              <span className="text-[9px] font-mono text-neutral-500 uppercase">Hourly telemetry</span>
             </div>
-            <div className="h-60 w-full">
+            <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={occupancyTrendData}>
-                  <XAxis dataKey="time" stroke="#6b7280" fontSize={10} tickLine={false} />
-                  <YAxis stroke="#6b7280" fontSize={10} tickLine={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#111827', border: '1px solid #374151' }} />
-                  <Area type="monotone" dataKey="rate" stroke="#8b5cf6" fill="rgba(139, 92, 246, 0.1)" strokeWidth={2} />
+                  <XAxis dataKey="time" stroke="#525252" fontSize={10} tickLine={false} />
+                  <YAxis stroke="#525252" fontSize={10} tickLine={false} />
+                  <Tooltip contentStyle={{ backgroundColor: '#0a0a0a', border: '1px solid #262626' }} />
+                  <Area type="monotone" dataKey="rate" stroke="#a3a3a3" fill="rgba(255,255,255,0.02)" strokeWidth={1.5} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -211,92 +201,91 @@ export default function OwnerDashboard() {
     );
   };
 
-  // Tab: Lots
   const renderLots = () => {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         
-        {/* Lot Form Dialog (Collapse/inline) */}
-        <div className="rounded-2xl border border-gray-850 bg-gray-900/30 p-5">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">List a New Parking Lot</h3>
+        {/* Create Lot Form */}
+        <div className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-4">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400">List New Infrastructure Asset</h3>
           
           <form onSubmit={handleCreateLotSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div className="md:col-span-2">
-              <label className="text-[10px] text-gray-500 uppercase block">Lot / Property Name</label>
+              <label className="text-[10px] text-neutral-500 font-bold uppercase block">Asset Designation</label>
               <input
                 type="text"
                 placeholder="Downtown Corporate Park"
                 value={newLotName}
                 onChange={(e) => setNewLotName(e.target.value)}
-                className="w-full rounded-xl border border-gray-850 bg-gray-950 px-3 py-2 text-xs text-white focus:outline-none mt-1"
+                className="w-full rounded border border-neutral-800 bg-neutral-950 px-3.5 py-2 text-xs text-white focus:outline-none mt-1"
                 required
               />
             </div>
             <div>
-              <label className="text-[10px] text-gray-500 uppercase block">Address</label>
+              <label className="text-[10px] text-neutral-500 font-bold uppercase block">Coordinates / Address</label>
               <input
                 type="text"
                 placeholder="20 Pine St"
                 value={newLotAddress}
                 onChange={(e) => setNewLotAddress(e.target.value)}
-                className="w-full rounded-xl border border-gray-850 bg-gray-950 px-3 py-2 text-xs text-white focus:outline-none mt-1"
+                className="w-full rounded border border-neutral-800 bg-neutral-950 px-3.5 py-2 text-xs text-white focus:outline-none mt-1"
                 required
               />
             </div>
             <div>
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 py-2.5 text-xs font-semibold text-white transition-colors"
+                className="w-full rounded bg-white text-black py-2 text-xs font-bold cursor-pointer"
               >
-                <Plus className="h-4 w-4" /> Add Lot
+                List Property
               </button>
             </div>
           </form>
 
           {lotSuccessMsg && (
-            <p className="text-xs text-emerald-400 mt-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3">
+            <p className="text-xs text-emerald-500 bg-emerald-950/10 border border-emerald-900/25 rounded p-3">
               {lotSuccessMsg}
             </p>
           )}
         </div>
 
-        {/* Existing Lots list */}
+        {/* Existing Lots */}
         <div className="space-y-4">
-          <h3 className="font-outfit text-base font-bold text-white">Your Listed Lots</h3>
+          <h3 className="text-xs font-extrabold uppercase tracking-widest text-neutral-450">Active Infrastructure</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {myLots.map(lot => (
-              <div key={lot.id} className="rounded-2xl border border-gray-850 bg-gray-900/40 p-5 space-y-4">
+              <div key={lot.id} className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-6">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-semibold text-base text-white">{lot.name}</h4>
-                    <p className="text-xs text-gray-400 mt-1">{lot.address}</p>
+                    <h4 className="font-bold text-sm text-white">{lot.name}</h4>
+                    <p className="text-xs text-neutral-500 mt-1">{lot.address}</p>
                   </div>
 
-                  <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${lot.verified ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse'}`}>
-                    {lot.verified ? 'Verified' : 'Pending Verification'}
+                  <span className={`rounded border px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider ${lot.verified ? 'border-neutral-800 bg-neutral-900 text-neutral-450' : 'border-neutral-900 text-neutral-600'}`}>
+                    {lot.verified ? 'Verified' : 'Validation Pending'}
                   </span>
                 </div>
 
-                <div className="border-t border-gray-850 pt-3 flex justify-between items-center text-xs">
+                <div className="border-t border-neutral-900 pt-4 flex justify-between items-center text-xs font-mono text-neutral-400">
                   <div>
-                    <span className="text-gray-500 block">Pricing / Hour</span>
-                    <strong className="text-white mt-1 block">₹{lot.price}</strong>
+                    <span className="text-[10px] text-neutral-500 uppercase block font-sans font-bold">Base Rate</span>
+                    <strong className="text-white block mt-1">₹{lot.price}/hr</strong>
                   </div>
                   <div>
-                    <span className="text-gray-500 block">Total slots</span>
-                    <strong className="text-white mt-1 block">{lot.slots.length} bays</strong>
+                    <span className="text-[10px] text-neutral-500 uppercase block font-sans font-bold">Total Bays</span>
+                    <strong className="text-white block mt-1">{lot.slots.length} Units</strong>
                   </div>
                   <div className="text-right">
-                    <span className="text-gray-500 block">Occupied / Reserved</span>
-                    <strong className="text-blue-400 mt-1 block">
-                      {lot.slots.filter(s => s.status !== 'Available').length} slots
+                    <span className="text-[10px] text-neutral-500 uppercase block font-sans font-bold">Occupancy</span>
+                    <strong className="text-white block mt-1">
+                      {lot.slots.filter(s => s.status !== 'Available').length} filled
                     </strong>
                   </div>
                 </div>
 
-                {/* Slots Live status controls */}
-                <div className="pt-3 border-t border-gray-850">
-                  <span className="text-[10px] text-gray-500 uppercase block font-bold mb-2">Live Slot Toggles</span>
+                {/* Slots Live status toggling */}
+                <div className="pt-4 border-t border-neutral-900">
+                  <span className="text-[9px] text-neutral-500 uppercase block font-bold mb-3">Live Bay Telemetry Toggles</span>
                   <div className="grid grid-cols-4 gap-2">
                     {lot.slots.map(slot => {
                       const isOccupied = slot.status === 'Occupied';
@@ -304,10 +293,10 @@ export default function OwnerDashboard() {
                         <button
                           key={slot.id}
                           onClick={() => updateSlotStatus(lot.id, slot.id, isOccupied ? 'Available' : 'Occupied')}
-                          className={`p-1.5 text-[10px] font-mono rounded text-center border font-bold transition-all ${
+                          className={`p-1.5 text-[10px] font-mono rounded text-center border font-bold transition-all cursor-pointer ${
                             isOccupied 
-                              ? 'bg-rose-950/20 border-rose-900/40 text-rose-400' 
-                              : 'bg-gray-850 border-gray-800 text-gray-400 hover:border-gray-700'
+                              ? 'bg-neutral-900 border-neutral-800 text-neutral-300' 
+                              : 'bg-neutral-950 border-neutral-900 text-neutral-600 hover:border-neutral-800'
                           }`}
                         >
                           {slot.label}
@@ -326,19 +315,18 @@ export default function OwnerDashboard() {
     );
   };
 
-  // Tab: Add Slot
   const renderAddSlot = () => {
     return (
       <div className="max-w-md space-y-6">
-        <h3 className="font-outfit text-lg font-bold">Configure Parking Slots</h3>
+        <h3 className="text-xs font-extrabold uppercase tracking-widest text-neutral-450">Configure Unit Bays</h3>
         
-        <form onSubmit={handleCreateSlotSubmit} className="rounded-2xl border border-gray-850 bg-gray-900/30 p-6 space-y-4">
+        <form onSubmit={handleCreateSlotSubmit} className="rounded-xl border border-neutral-900 bg-neutral-950 p-6 space-y-4">
           <div>
-            <label className="text-[10px] text-gray-500 uppercase block">Select Lot</label>
+            <label className="text-[10px] text-neutral-500 font-bold uppercase block">Select Facility</label>
             <select
               value={selectedLotId}
               onChange={(e) => setSelectedLotId(e.target.value)}
-              className="w-full rounded-xl border border-gray-850 bg-gray-950 px-3 py-2 text-xs text-white focus:outline-none mt-1"
+              className="w-full rounded border border-neutral-800 bg-neutral-950 px-3.5 py-2 text-xs text-white focus:outline-none mt-1 cursor-pointer"
             >
               {myLots.map(l => (
                 <option key={l.id} value={l.id}>{l.name}</option>
@@ -347,40 +335,40 @@ export default function OwnerDashboard() {
           </div>
 
           <div>
-            <label className="text-[10px] text-gray-500 uppercase block">Slot Label / Number</label>
+            <label className="text-[10px] text-neutral-500 font-bold uppercase block">Bay Code Identifier</label>
             <input
               type="text"
               placeholder="e.g. C-05"
               value={newSlotLabel}
               onChange={(e) => setNewSlotLabel(e.target.value)}
-              className="w-full rounded-xl border border-gray-850 bg-gray-950 px-3 py-2 text-xs text-white focus:outline-none mt-1 font-mono uppercase"
+              className="w-full rounded border border-neutral-800 bg-neutral-950 px-3.5 py-2 text-xs text-white focus:outline-none mt-1 font-mono uppercase"
               required
             />
           </div>
 
           <div>
-            <label className="text-[10px] text-gray-500 uppercase block">Bay Type</label>
+            <label className="text-[10px] text-neutral-500 font-bold uppercase block">Unit Specifications</label>
             <select
               value={newSlotType}
               onChange={(e) => setNewSlotType(e.target.value)}
-              className="w-full rounded-xl border border-gray-850 bg-gray-950 px-3 py-2 text-xs text-white focus:outline-none mt-1"
+              className="w-full rounded border border-neutral-800 bg-neutral-950 px-3.5 py-2 text-xs text-white focus:outline-none mt-1 cursor-pointer"
             >
               <option value="Standard">Standard Space</option>
-              <option value="EV-Charging">EV Charging Dock</option>
-              <option value="Disabled">Accessible (Disabled) Space</option>
+              <option value="EV-Charging">EV Charging Station</option>
+              <option value="Disabled">Accessible Space</option>
             </select>
           </div>
 
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 py-2.5 text-xs font-semibold text-white transition-colors"
+            className="w-full rounded bg-white text-black py-2.5 text-xs font-bold transition-all cursor-pointer"
           >
-            Create New Spot
+            Deploy New Slot
           </button>
         </form>
 
         {slotSuccessMsg && (
-          <p className="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3">
+          <p className="text-xs text-emerald-500 bg-emerald-950/10 border border-emerald-900/25 rounded p-3">
             {slotSuccessMsg}
           </p>
         )}
@@ -388,36 +376,35 @@ export default function OwnerDashboard() {
     );
   };
 
-  // Tab: Bookings
   const renderBookings = () => {
     return (
       <div className="space-y-4">
-        <h3 className="font-outfit text-lg font-bold">Incoming Reservations</h3>
+        <h3 className="text-xs font-extrabold uppercase tracking-widest text-neutral-450">Incoming Reservations</h3>
         {myBookings.length === 0 ? (
-          <p className="text-xs text-gray-500">No driver reservations registered yet.</p>
+          <p className="text-xs text-neutral-500">No driver reservations registered yet.</p>
         ) : (
-          <div className="rounded-2xl border border-gray-850 bg-gray-900/20 overflow-hidden">
+          <div className="rounded-xl border border-neutral-900 bg-neutral-950 overflow-hidden shadow-2xl">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-gray-950 border-b border-gray-800 text-gray-400 font-semibold">
-                  <th className="p-4">Lot</th>
+                <tr className="bg-neutral-900/60 border-b border-neutral-900 text-neutral-500 font-extrabold uppercase tracking-wider text-[9px]">
+                  <th className="p-4">Facility</th>
                   <th className="p-4">Bay</th>
                   <th className="p-4">Plate</th>
-                  <th className="p-4">Schedule</th>
-                  <th className="p-4">Expected Net</th>
+                  <th className="p-4">Arrival</th>
+                  <th className="p-4">Net Yield</th>
                   <th className="p-4">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-850">
+              <tbody className="divide-y divide-neutral-900 text-neutral-300">
                 {myBookings.map(b => (
-                  <tr key={b.id} className="hover:bg-gray-900/30">
-                    <td className="p-4 font-semibold text-white">{b.lotName}</td>
-                    <td className="p-4 font-mono">{b.slotId}</td>
-                    <td className="p-4 font-mono">{b.vehiclePlate}</td>
-                    <td className="p-4 text-gray-400">{b.date} at {b.time}</td>
-                    <td className="p-4 text-emerald-400 font-bold">₹{b.amount}</td>
+                  <tr key={b.id} className="hover:bg-neutral-900/10">
+                    <td className="p-4 font-bold text-white">{b.lotName}</td>
+                    <td className="p-4 font-mono text-[11px]">{b.slotId}</td>
+                    <td className="p-4 font-mono text-[11px] uppercase">{b.vehiclePlate}</td>
+                    <td className="p-4 text-neutral-500">{b.date} at {b.time}</td>
+                    <td className="p-4 text-white font-bold">₹{b.amount}</td>
                     <td className="p-4">
-                      <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${b.status === 'Upcoming' ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20' : 'bg-gray-800 text-gray-500'}`}>
+                      <span className="rounded border border-neutral-800 bg-neutral-900 px-2 py-0.5 text-[9px] font-extrabold tracking-wider uppercase text-neutral-450">
                         {b.status}
                       </span>
                     </td>
@@ -442,14 +429,14 @@ export default function OwnerDashboard() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row bg-gray-950 text-white min-h-screen">
+    <div className="flex flex-col md:flex-row bg-[#0A0A0A] text-white min-h-screen">
       <Sidebar />
       <main className="flex-1 p-6 md:p-8">
         
-        <div className="border-b border-gray-900 pb-5 mb-6 flex justify-between items-center">
+        <div className="border-b border-neutral-900 pb-5 mb-8 flex justify-between items-center">
           <div>
-            <h2 className="font-outfit text-2xl font-bold capitalize">Owner Dashboard</h2>
-            <p className="text-xs text-gray-500 mt-1">Manage parking properties, configure bays, and track revenue flows.</p>
+            <h2 className="font-outfit text-xl font-bold uppercase tracking-wider">Facility Management Desk</h2>
+            <p className="text-xs text-neutral-500 mt-1">Configure asset capacity, view occupancy spikes, and trace revenue pipelines.</p>
           </div>
         </div>
 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { 
   Search, SlidersHorizontal, Star, MapPin, Shield, Zap, Car,
-  CircleDollarSign, ArrowUpDown, ChevronRight, Bookmark, Heart
+  CircleDollarSign, ArrowUpDown, ChevronRight, Heart, Sparkles, Navigation
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -78,329 +78,305 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 bg-gray-950 min-h-screen text-white">
-      {/* Top Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="font-outfit text-2xl font-bold tracking-tight text-white sm:text-3xl">Find Parking Slots</h1>
-          <p className="text-xs text-gray-400 mt-1">Discover and book premium parking spaces in your city</p>
-        </div>
+    <div className="relative min-h-screen bg-[#02040a] text-white">
+      {/* Background ambient light */}
+      <div className="absolute top-0 right-1/4 h-[500px] w-[500px] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-20 left-10 h-[400px] w-[400px] rounded-full bg-purple-600/5 blur-[100px] pointer-events-none" />
 
-        {/* Sort & Quick actions */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 rounded-xl border border-gray-800 bg-gray-900 px-3 py-2">
-            <ArrowUpDown className="h-3.5 w-3.5 text-gray-500" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-transparent text-xs font-semibold text-gray-300 outline-none cursor-pointer"
-            >
-              <option value="distance" className="bg-gray-900 text-white">Sort by Distance</option>
-              <option value="price" className="bg-gray-900 text-white">Sort by Price</option>
-              <option value="rating" className="bg-gray-900 text-white">Sort by Rating</option>
-            </select>
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 relative">
+        {/* Top Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/20 bg-blue-500/5 px-3 py-1 text-xs font-bold text-blue-400">
+              <Sparkles className="h-3.5 w-3.5" /> Direct Access Confirmed
+            </div>
+            <h1 className="font-outfit text-3xl font-extrabold tracking-tight sm:text-4xl">Find Parking Slots</h1>
+            <p className="text-sm text-gray-400">Discover and book premium parking spaces in your city instantly.</p>
           </div>
 
-          <button
-            onClick={() => setShowFiltersMobile(!showFiltersMobile)}
-            className="md:hidden flex items-center gap-2 rounded-xl border border-gray-800 bg-gray-900 px-3 py-2 text-xs font-semibold text-gray-300"
-          >
-            <SlidersHorizontal className="h-3.5 w-3.5" />
-            Filters
-          </button>
-        </div>
-      </div>
+          {/* Sort Menu */}
+          <div className="flex items-center gap-3 self-start md:self-auto">
+            <div className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-4 py-2.5 shadow-lg">
+              <ArrowUpDown className="h-4 w-4 text-gray-400" />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-transparent text-xs font-bold text-gray-300 outline-none cursor-pointer"
+              >
+                <option value="distance" className="bg-gray-950 text-white">Sort by Distance</option>
+                <option value="price" className="bg-gray-950 text-white">Sort by Price</option>
+                <option value="rating" className="bg-gray-950 text-white">Sort by Rating</option>
+              </select>
+            </div>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* Sidebar Filters (Desktop) */}
-        <div className="hidden md:block lg:col-span-3 rounded-2xl border border-gray-800 bg-gray-900/40 p-5 backdrop-blur-sm sticky top-24">
-          <div className="flex items-center justify-between border-b border-gray-800/80 pb-4 mb-5">
-            <span className="font-semibold text-sm text-white flex items-center gap-2">
-              <SlidersHorizontal className="h-4 w-4 text-blue-500" /> Filters
-            </span>
-            <button onClick={resetFilters} className="text-xs text-gray-500 hover:text-blue-400 transition-colors">
-              Reset
+            <button
+              onClick={() => setShowFiltersMobile(!showFiltersMobile)}
+              className="md:hidden flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-4 py-2.5 text-xs font-bold text-gray-300"
+            >
+              <SlidersHorizontal className="h-4 w-4" /> Filters
             </button>
           </div>
-
-          {/* Search bar */}
-          <div className="space-y-4 mb-6">
-            <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Destination</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-              <input
-                type="text"
-                placeholder="Search street, building..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-gray-800 bg-gray-950 pl-10 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Price Range Slider */}
-          <div className="space-y-4 mb-6">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Max Price / Hr</label>
-              <span className="text-xs font-mono font-bold text-blue-400">₹{maxPrice}</span>
-            </div>
-            <input
-              type="range"
-              min="30"
-              max="300"
-              step="10"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(parseFloat(e.target.value))}
-              className="w-full h-1 bg-gray-850 rounded-lg appearance-none cursor-pointer accent-blue-500"
-            />
-          </div>
-
-          {/* Features Checkbox list */}
-          <div className="space-y-3">
-            <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Amenities</label>
-            
-            <label className="flex items-center gap-2.5 cursor-pointer group text-xs text-gray-400 hover:text-white">
-              <input
-                type="checkbox"
-                checked={featuresFilter.covered}
-                onChange={() => handleFeatureToggle('covered')}
-                className="h-4 w-4 rounded border-gray-800 bg-gray-950 text-blue-600 focus:ring-0 cursor-pointer"
-              />
-              <span>Covered Parking</span>
-            </label>
-
-            <label className="flex items-center gap-2.5 cursor-pointer group text-xs text-gray-400 hover:text-white">
-              <input
-                type="checkbox"
-                checked={featuresFilter.open}
-                onChange={() => handleFeatureToggle('open')}
-                className="h-4 w-4 rounded border-gray-800 bg-gray-950 text-blue-600 focus:ring-0 cursor-pointer"
-              />
-              <span>Open Parking Lot</span>
-            </label>
-
-            <label className="flex items-center gap-2.5 cursor-pointer group text-xs text-gray-400 hover:text-white">
-              <input
-                type="checkbox"
-                checked={featuresFilter.evCharging}
-                onChange={() => handleFeatureToggle('evCharging')}
-                className="h-4 w-4 rounded border-gray-800 bg-gray-950 text-blue-600 focus:ring-0 cursor-pointer"
-              />
-              <span>EV Charging Station</span>
-            </label>
-
-            <label className="flex items-center gap-2.5 cursor-pointer group text-xs text-gray-400 hover:text-white">
-              <input
-                type="checkbox"
-                checked={featuresFilter.cctv}
-                onChange={() => handleFeatureToggle('cctv')}
-                className="h-4 w-4 rounded border-gray-800 bg-gray-950 text-blue-600 focus:ring-0 cursor-pointer"
-              />
-              <span>CCTV Monitoring</span>
-            </label>
-
-            <label className="flex items-center gap-2.5 cursor-pointer group text-xs text-gray-400 hover:text-white">
-              <input
-                type="checkbox"
-                checked={featuresFilter.valet}
-                onChange={() => handleFeatureToggle('valet')}
-                className="h-4 w-4 rounded border-gray-800 bg-gray-950 text-blue-600 focus:ring-0 cursor-pointer"
-              />
-              <span>Valet Parking</span>
-            </label>
-          </div>
         </div>
 
-        {/* Mobile Filters Panel */}
-        <AnimatePresence>
-          {showFiltersMobile && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden lg:col-span-3 rounded-2xl border border-gray-800 bg-gray-900 p-5 mb-4"
-            >
-              <div className="flex items-center justify-between border-b border-gray-800 pb-3 mb-4">
-                <span className="font-semibold text-sm">Filters</span>
-                <button onClick={resetFilters} className="text-xs text-gray-500 hover:text-blue-400">Reset</button>
-              </div>
-
-              <div className="space-y-4">
-                {/* Search */}
-                <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Destination</label>
-                  <input
-                    type="text"
-                    placeholder="Search street, building..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full rounded-xl border border-gray-800 bg-gray-950 px-3 py-2 text-xs text-white focus:outline-none mt-1"
-                  />
-                </div>
-
-                {/* Price */}
-                <div>
-                  <div className="flex justify-between">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Max Price</label>
-                    <span className="text-xs font-bold text-blue-400">₹{maxPrice}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="30"
-                    max="300"
-                    step="10"
-                    value={maxPrice}
-                    onChange={(e) => setMaxPrice(parseFloat(e.target.value))}
-                    className="w-full accent-blue-500 mt-1"
-                  />
-                </div>
-
-                {/* Features */}
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {Object.keys(featuresFilter).map((f) => (
-                    <button
-                      key={f}
-                      onClick={() => handleFeatureToggle(f)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${
-                        featuresFilter[f] 
-                          ? 'bg-blue-600/10 text-blue-400 border-blue-500/30' 
-                          : 'border-gray-850 bg-gray-950 text-gray-400'
-                      }`}
-                    >
-                      {f.charAt(0).toUpperCase() + f.slice(1).replace('Charging', ' Charging')}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Listings Grid */}
-        <div className="lg:col-span-9">
-          {filteredLots.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-gray-800 bg-gray-900/10 p-12 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gray-900 text-gray-500 mb-4 border border-gray-800">
-                <Car className="h-6 w-6" />
-              </div>
-              <h3 className="font-semibold text-base text-white">No parking lots found</h3>
-              <p className="text-xs text-gray-500 max-w-xs mx-auto mt-1.5">
-                We couldn't find any parking slots matching your active filters. Try expanding your search or pricing limits.
-              </p>
-              <button
-                onClick={resetFilters}
-                className="mt-5 rounded-xl border border-gray-800 bg-gray-900 px-4 py-2 text-xs font-semibold text-gray-300 hover:text-white transition-colors"
-              >
-                Clear all filters
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Sidebar Filters (Desktop) */}
+          <div className="hidden md:block lg:col-span-3 rounded-2xl border border-white/5 bg-white/[0.02] p-6 backdrop-blur-xl sticky top-28 shadow-xl">
+            <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-6">
+              <span className="font-bold text-sm text-white flex items-center gap-2">
+                <SlidersHorizontal className="h-4.5 w-4.5 text-blue-500" /> Search Filters
+              </span>
+              <button onClick={resetFilters} className="text-xs font-bold text-gray-400 hover:text-blue-400 transition-colors cursor-pointer">
+                Reset
               </button>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredLots.map((lot, idx) => {
-                const isSaved = savedLocations.includes(lot.id);
-                return (
-                  <motion.div
-                    key={lot.id}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: idx * 0.05 }}
-                    className="group relative rounded-2xl border border-gray-850 bg-gray-900/30 overflow-hidden flex flex-col justify-between hover:border-gray-700/80 transition-all duration-300"
-                  >
-                    {/* Header Image */}
-                    <div className="relative h-44 w-full bg-gray-950 overflow-hidden">
-                      <img
-                        src={lot.image}
-                        alt={lot.name}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-transparent" />
-                      
-                      {/* Price Badge */}
-                      <div className="absolute bottom-3 left-3 flex items-center gap-1 rounded-lg bg-gray-950/80 backdrop-blur-md border border-white/5 px-2 py-1">
-                        <CircleDollarSign className="h-3.5 w-3.5 text-emerald-400" />
-                        <span className="text-xs font-bold text-white">₹{lot.price}/hr</span>
-                      </div>
 
-                      {/* Distance Badge */}
-                      <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-lg bg-blue-600/90 backdrop-blur-md px-2.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
-                        {lot.distance}
-                      </div>
+            {/* Search destination */}
+            <div className="space-y-2 mb-6">
+              <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Destination</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="Search street, building..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full rounded-xl border border-white/5 bg-[#02040a]/65 pl-10 pr-4 py-2.5 text-xs text-white placeholder-gray-500 focus:border-blue-500/60 focus:outline-none"
+                />
+              </div>
+            </div>
 
-                      {/* Favorite Button */}
-                      <button
-                        onClick={(e) => { e.stopPropagation(); toggleSaveLocation(lot.id); }}
-                        className="absolute top-3 right-3 rounded-lg bg-gray-950/70 p-1.5 text-gray-400 hover:text-rose-500 transition-colors duration-200 border border-white/5 backdrop-blur-md"
-                      >
-                        <Heart className={`h-4 w-4 ${isSaved ? 'fill-rose-500 text-rose-500' : ''}`} />
-                      </button>
+            {/* Price slider */}
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Max Price / Hr</label>
+                <span className="text-xs font-mono font-bold text-blue-400 bg-blue-500/5 px-2 py-0.5 rounded border border-blue-500/10">₹{maxPrice}</span>
+              </div>
+              <input
+                type="range"
+                min="30"
+                max="300"
+                step="10"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(parseFloat(e.target.value))}
+                className="w-full h-1 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+              />
+            </div>
+
+            {/* Features list */}
+            <div className="space-y-4">
+              <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 block">Amenities</label>
+              
+              <div className="space-y-3">
+                {[
+                  { key: 'covered', label: 'Covered Parking' },
+                  { key: 'open', label: 'Open Parking Lot' },
+                  { key: 'evCharging', label: 'EV Charging Station' },
+                  { key: 'cctv', label: 'CCTV Monitoring' },
+                  { key: 'valet', label: 'Valet Parking' }
+                ].map((item) => (
+                  <label key={item.key} className="flex items-center gap-3 cursor-pointer group text-xs text-gray-400 hover:text-white transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={featuresFilter[item.key]}
+                      onChange={() => handleFeatureToggle(item.key)}
+                      className="h-4.5 w-4.5 rounded border-white/10 bg-white/[0.02] text-blue-600 focus:ring-0 cursor-pointer"
+                    />
+                    <span className="font-semibold">{item.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Filters Panel */}
+          <AnimatePresence>
+            {showFiltersMobile && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="md:hidden rounded-2xl border border-white/5 bg-white/[0.02] p-5 mb-6 backdrop-blur-xl"
+              >
+                <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
+                  <span className="font-bold text-sm">Filters</span>
+                  <button onClick={resetFilters} className="text-xs font-bold text-gray-400">Reset</button>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Destination</label>
+                    <input
+                      type="text"
+                      placeholder="Search street, building..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full rounded-xl border border-white/5 bg-[#02040a]/65 px-4.5 py-2.5 text-xs text-white focus:outline-none mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Max Price</label>
+                      <span className="text-xs font-bold text-blue-450">₹{maxPrice}</span>
                     </div>
+                    <input
+                      type="range"
+                      min="30"
+                      max="300"
+                      step="10"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(parseFloat(e.target.value))}
+                      className="w-full accent-blue-500 mt-1"
+                    />
+                  </div>
 
-                    {/* Content details */}
-                    <div className="p-5 flex-1 flex flex-col justify-between">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-semibold text-base text-white group-hover:text-blue-400 transition-colors">
-                            {lot.name}
-                          </h3>
-                          <div className="flex items-center gap-1 text-xs text-amber-500 font-semibold">
-                            <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
-                            <span>{lot.rating}</span>
-                          </div>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {Object.keys(featuresFilter).map((f) => (
+                      <button
+                        key={f}
+                        onClick={() => handleFeatureToggle(f)}
+                        className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all ${
+                          featuresFilter[f] 
+                            ? 'bg-blue-600/10 text-blue-400 border-blue-500/30' 
+                            : 'border-white/5 bg-white/[0.02] text-gray-400'
+                        }`}
+                      >
+                        {f.charAt(0).toUpperCase() + f.slice(1).replace('Charging', ' Charging')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Listings Grid */}
+          <div className="lg:col-span-9">
+            {filteredLots.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-white/10 bg-white/[0.01] p-16 text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.02] text-gray-500 mb-6 border border-white/5">
+                  <Car className="h-6 w-6" />
+                </div>
+                <h3 className="font-outfit text-lg font-bold text-white">No parking lots found</h3>
+                <p className="text-xs text-gray-500 max-w-sm mx-auto mt-2 leading-relaxed">
+                  We couldn't find any verified spaces matching your active filter settings. Try expanding your search pricing range or amenities.
+                </p>
+                <button
+                  onClick={resetFilters}
+                  className="mt-6 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/5 px-5 py-2.5 text-xs font-bold text-gray-300 hover:text-white transition-colors"
+                >
+                  Clear All Filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {filteredLots.map((lot, idx) => {
+                  const isSaved = savedLocations.includes(lot.id);
+                  return (
+                    <motion.div
+                      key={lot.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: idx * 0.05 }}
+                      className="group relative rounded-3xl border border-white/5 bg-white/[0.01] overflow-hidden flex flex-col justify-between hover:border-blue-500/25 transition-all duration-500 shadow-xl"
+                    >
+                      {/* Image & overlay info */}
+                      <div className="relative h-56 w-full bg-[#02040a] overflow-hidden">
+                        <img
+                          src={lot.image}
+                          alt={lot.name}
+                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#02040a] via-[#02040a]/40 to-transparent" />
+                        
+                        {/* Price Badge */}
+                        <div className="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-xl bg-gray-950/80 backdrop-blur-xl border border-white/10 px-3 py-1.5">
+                          <span className="text-sm font-extrabold text-white">₹{lot.price}</span>
+                          <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">/ hr</span>
                         </div>
 
-                        <p className="text-[11px] text-gray-400 flex items-center gap-1">
-                          <MapPin className="h-3.5 w-3.5 text-gray-500 shrink-0" />
-                          <span className="truncate">{lot.address}</span>
-                        </p>
-
-                        {/* Amenities pills */}
-                        <div className="flex flex-wrap gap-1.5 pt-2">
-                          {lot.features.evCharging && (
-                            <span className="flex items-center gap-1 rounded bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 text-[9px] font-semibold text-blue-400">
-                              <Zap className="h-2.5 w-2.5" /> EV
-                            </span>
-                          )}
-                          {lot.features.cctv && (
-                            <span className="flex items-center gap-1 rounded bg-gray-800 border border-gray-700 px-1.5 py-0.5 text-[9px] font-semibold text-gray-400">
-                              <Shield className="h-2.5 w-2.5" /> CCTV
-                            </span>
-                          )}
-                          {lot.features.valet && (
-                            <span className="flex items-center gap-1 rounded bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 text-[9px] font-semibold text-purple-400">
-                              Valet
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Footer Actions */}
-                      <div className="flex items-center justify-between border-t border-gray-850 pt-4 mt-4">
-                        <div className="text-left">
-                          <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500">Live Availability</div>
-                          <div className="flex items-center gap-1">
-                            <span className={`h-1.5 w-1.5 rounded-full ${lot.availableSlotsCount > 3 ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
-                            <span className={`text-xs font-bold ${lot.availableSlotsCount > 3 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                              {lot.availableSlotsCount} slots available
-                            </span>
-                          </div>
+                        {/* Distance Badge */}
+                        <div className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-xl bg-blue-600/90 backdrop-blur-xl border border-white/10 px-3 py-1.5 text-[10px] font-extrabold text-white tracking-widest uppercase">
+                          <Navigation className="h-3 w-3" /> {lot.distance}
                         </div>
 
+                        {/* Starred Button */}
                         <button
-                          onClick={() => navigate(`/parking/${lot.id}`)}
-                          className="flex items-center gap-1 rounded-xl bg-gray-900 border border-gray-800 hover:border-blue-500/40 hover:bg-gray-800 hover:text-white px-3 py-2 text-xs font-bold text-gray-300 transition-all"
+                          onClick={(e) => { e.stopPropagation(); toggleSaveLocation(lot.id); }}
+                          className="absolute top-4 right-4 rounded-xl bg-gray-950/60 p-2.5 text-gray-400 hover:text-rose-500 transition-colors border border-white/5 backdrop-blur-xl cursor-pointer"
                         >
-                          <span>Reserve Spot</span>
-                          <ChevronRight className="h-3.5 w-3.5" />
+                          <Heart className={`h-4.5 w-4.5 transition-colors ${isSaved ? 'fill-rose-500 text-rose-500' : ''}`} />
                         </button>
                       </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          )}
+
+                      {/* Info details */}
+                      <div className="p-6 flex-1 flex flex-col justify-between">
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-outfit text-lg font-bold text-white group-hover:text-blue-450 transition-colors">
+                              {lot.name}
+                            </h3>
+                            <div className="flex items-center gap-1 text-xs text-amber-500 font-bold bg-amber-500/5 px-2 py-0.5 rounded border border-amber-500/10 shadow-sm">
+                              <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                              <span>{lot.rating}</span>
+                            </div>
+                          </div>
+
+                          <p className="text-xs text-gray-400 flex items-center gap-1.5">
+                            <MapPin className="h-4 w-4 text-gray-500 shrink-0" />
+                            <span className="truncate">{lot.address}</span>
+                          </p>
+
+                          {/* Amenity tags */}
+                          <div className="flex flex-wrap gap-2 pt-2">
+                            {lot.features.evCharging && (
+                              <span className="flex items-center gap-1 rounded-lg bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 text-[10px] font-bold text-blue-400">
+                                <Zap className="h-3 w-3" /> EV Charging
+                              </span>
+                            )}
+                            {lot.features.cctv && (
+                              <span className="flex items-center gap-1 rounded-lg bg-white/[0.02] border border-white/5 px-2.5 py-1 text-[10px] font-bold text-gray-400">
+                                <Shield className="h-3 w-3" /> CCTV Secure
+                              </span>
+                            )}
+                            {lot.features.valet && (
+                              <span className="flex items-center gap-1 rounded-lg bg-purple-500/10 border border-purple-500/20 px-2.5 py-1 text-[10px] font-bold text-purple-400">
+                                Valet
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Bottom reservation section */}
+                        <div className="flex items-center justify-between border-t border-white/5 pt-5 mt-6">
+                          <div>
+                            <div className="text-[9px] font-extrabold uppercase tracking-wider text-gray-500">Live Capacity</div>
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <span className={`h-2 w-2 rounded-full ${lot.availableSlotsCount > 3 ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
+                              <span className={`text-xs font-bold ${lot.availableSlotsCount > 3 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                {lot.availableSlotsCount} slots left
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => navigate(`/parking/${lot.id}`)}
+                            className="flex items-center gap-1 rounded-xl bg-white/[0.02] border border-white/5 hover:border-blue-500/40 hover:bg-blue-600/15 hover:text-blue-400 px-4.5 py-2.5 text-xs font-extrabold text-gray-300 transition-all cursor-pointer"
+                          >
+                            <span>Inspect Slots</span>
+                            <ChevronRight className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
         </div>
 
       </div>

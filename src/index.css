@@ -1,101 +1,158 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @import "tailwindcss";
 
 :root {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   scroll-behavior: smooth;
+  color-scheme: dark;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #030712; /* Sleek Slate Dark */
-  color: #f3f4f6;
+  background-color: #0A0A0A; /* Charcoal Black */
+  color: #F3F4F6; /* Soft Gray */
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Custom Scrollbar */
+/* Custom Minimal Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0b0f19;
+  background: #0A0A0A;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1f2937;
-  border-radius: 4px;
+  background: #262626;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3b82f6; /* Electric Blue Accent */
+  background: #404040;
 }
 
-/* Glassmorphism Utilities */
-.glass-panel {
-  background: rgba(17, 24, 39, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+/* Premium Card Styles */
+.premium-card {
+  background-color: #121212;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
 }
 
-.glass-panel-light {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+.premium-card-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Animated Background Gradients */
-.bg-radial-gradient {
-  background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.15) 0%, rgba(3, 7, 18, 0) 70%);
+.premium-card-hover:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  background-color: #161616;
+  transform: translateY(-1px);
 }
 
-.bg-radial-gradient-purple {
-  background: radial-gradient(circle at 30% 20%, rgba(147, 51, 234, 0.12) 0%, rgba(3, 7, 18, 0) 60%);
+/* Minimal Input */
+.premium-input {
+  background-color: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-size: 13px;
+  padding: 10px 14px;
+  transition: all 0.2s ease;
 }
 
-/* Custom Glow borders */
-.glow-border:hover {
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
-  border-color: rgba(59, 130, 246, 0.5);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.premium-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.2);
+  background-color: #141414;
 }
 
-/* Shimmer animation for loading states */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+/* Apple/Stripe-like Minimal Buttons */
+.btn-premium {
+  background-color: #FFFFFF;
+  color: #0A0A0A;
+  font-weight: 500;
+  font-size: 13px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
-.shimmer {
-  background: linear-gradient(90deg, #1f2937 25%, #374151 50%, #1f2937 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+.btn-premium:hover {
+  background-color: #E5E7EB;
+  transform: translateY(-0.5px);
 }
 
-/* Premium active parking slot pulsating effect */
-@keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.9);
-  }
+.btn-ghost {
+  background-color: transparent;
+  color: #9CA3AF;
+  font-weight: 500;
+  font-size: 13px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
-.pulse-glow {
-  animation: pulseGlow 2s infinite ease-in-out;
+.btn-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Heading Typography */
-.font-outfit {
-  font-family: 'Outfit', sans-serif;
+/* Minimal badging */
+.badge-emerald {
+  background-color: rgba(15, 118, 110, 0.1);
+  border: 1px solid rgba(15, 118, 110, 0.2);
+  color: #0F766E;
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.badge-muted {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #9CA3AF;
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* Premium Layouts */
+.border-titanium {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.bg-charcoal {
+  background-color: #0A0A0A;
+}
+
+.bg-graphite {
+  background-color: #121212;
+}
+
+.bg-light-graphite {
+  background-color: #161616;
+}
+
+.text-soft-gray {
+  color: #E5E7EB;
 }

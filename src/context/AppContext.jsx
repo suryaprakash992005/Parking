@@ -208,7 +208,21 @@ export const AppProvider = ({ children }) => {
   // Parking Lots
   const [parkingLots, setParkingLots] = useState(() => {
     const saved = localStorage.getItem('parkease_parking_lots');
-    return saved ? JSON.parse(saved) : INITIAL_PARKING_LOTS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // If prices are in USD (less than 20), clear and use new INR defaults
+        if (parsed.some(lot => lot.price < 20)) {
+          localStorage.removeItem('parkease_parking_lots');
+          localStorage.removeItem('parkease_bookings');
+          return INITIAL_PARKING_LOTS;
+        }
+        return parsed;
+      } catch (e) {
+        return INITIAL_PARKING_LOTS;
+      }
+    }
+    return INITIAL_PARKING_LOTS;
   });
 
   // Bookings
