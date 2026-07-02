@@ -50,10 +50,10 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-full md:w-60 border-r border-neutral-900 bg-neutral-950 p-4 flex flex-col gap-1 min-h-[calc(100vh-3.5rem)]">
+    <div className="w-full md:w-60 border-r border-gray-250/80 bg-white p-4 flex flex-col gap-1 min-h-[calc(100vh-4rem)] shadow-sm">
       <div className="mb-4 px-3.5 py-2">
-        <h2 className="text-[9px] font-extrabold uppercase tracking-widest text-neutral-500">
-          Workplace / {role.toUpperCase()}
+        <h2 className="text-[9px] font-extrabold uppercase tracking-widest text-gray-400">
+          Workspace / {role.toUpperCase()}
         </h2>
       </div>
 
@@ -67,9 +67,9 @@ export default function Sidebar() {
               <Link
                 key={item.id}
                 to={item.link}
-                className="flex items-center gap-3 rounded-lg px-3.5 py-2 text-[11px] font-semibold text-neutral-400 hover:bg-neutral-900/50 hover:text-white transition-all"
+                className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[11px] font-bold text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all"
               >
-                <Icon className="h-4 w-4 stroke-[1.8]" />
+                <Icon className="h-4 w-4 stroke-[2]" />
                 <span className="whitespace-nowrap">{item.name}</span>
               </Link>
             );
@@ -79,13 +79,13 @@ export default function Sidebar() {
             <button
               key={item.id}
               onClick={() => handleTabChange(item)}
-              className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-[11px] font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[11px] font-bold transition-all cursor-pointer ${
                 isActive 
-                  ? 'bg-neutral-900 text-white border border-neutral-800' 
-                  : 'text-neutral-400 hover:bg-neutral-900/50 hover:text-white border border-transparent'
+                  ? 'bg-blue-50 text-blue-600 border border-blue-100 shadow-inner' 
+                  : 'text-gray-500 hover:bg-gray-55/60 hover:text-gray-900 border border-transparent'
               }`}
             >
-              <Icon className={`h-4 w-4 stroke-[1.8] ${isActive ? 'text-white' : 'text-neutral-500'}`} />
+              <Icon className={`h-4 w-4 stroke-[2] ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
               <span className="whitespace-nowrap">{item.name}</span>
             </button>
           );

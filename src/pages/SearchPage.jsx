@@ -2,381 +2,260 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { 
-  Search, SlidersHorizontal, Star, MapPin, Shield, Zap, Car,
-  CircleDollarSign, ArrowUpDown, ChevronRight, Heart, Sparkles, Navigation
+  Search, MapPin, Zap, Shield, Star, Navigation, Filter, Calendar, Car, Clock, ShieldCheck
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export default function SearchPage() {
   const { parkingLots, toggleSaveLocation, savedLocations } = useApp();
   const navigate = useNavigate();
 
-  // Search state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('distance'); // 'distance', 'price', 'rating'
+  // Search filter parameters
+  const [destination, setDestination] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [time, setTime] = useState('12:00');
+  const [vehicle, setVehicle] = useState('Sedan');
 
-  // Filter states
-  const [showFiltersMobile, setShowFiltersMobile] = useState(false);
-  const [maxPrice, setMaxPrice] = useState(250);
-  const [featuresFilter, setFeaturesFilter] = useState({
+  // Filter chips
+  const [filters, setFilters] = useState({
     covered: false,
-    open: false,
     evCharging: false,
     cctv: false,
-    valet: false
+    valet: false,
+    open: false
   });
 
-  const handleFeatureToggle = (feature) => {
-    setFeaturesFilter(prev => ({ ...prev, [feature]: !prev[feature] }));
+  const toggleFilter = (key) => {
+    setFilters(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // Filter lots
+  // Filter listings
   const filteredLots = useMemo(() => {
     return parkingLots
-      .filter(lot => lot.verified) // Only verified lots on search
+      .filter(lot => lot.verified)
       .filter(lot => {
-        // Search query check
-        const matchesSearch = lot.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              lot.address.toLowerCase().includes(searchQuery.toLowerCase());
-        
-        // Price check
-        const matchesPrice = lot.price <= maxPrice;
+        const matchesDest = lot.name.toLowerCase().includes(destination.toLowerCase()) ||
+                            lot.address.toLowerCase().includes(destination.toLowerCase());
 
-        // Features check
-        const matchesCovered = !featuresFilter.covered || lot.features.covered;
-        const matchesOpen = !featuresFilter.open || lot.features.open;
-        const matchesEV = !featuresFilter.evCharging || lot.features.evCharging;
-        const matchesCCTV = !featuresFilter.cctv || lot.features.cctv;
-        const matchesValet = !featuresFilter.valet || lot.features.valet;
+        const matchesCovered = !filters.covered || lot.features.covered;
+        const matchesEV = !filters.evCharging || lot.features.evCharging;
+        const matchesCCTV = !filters.cctv || lot.features.cctv;
+        const matchesValet = !filters.valet || lot.features.valet;
 
-        return matchesSearch && matchesPrice && matchesCovered && matchesOpen && matchesEV && matchesCCTV && matchesValet;
-      })
-      .sort((a, b) => {
-        if (sortBy === 'distance') {
-          return parseFloat(a.distance) - parseFloat(b.distance);
-        }
-        if (sortBy === 'price') {
-          return a.price - b.price;
-        }
-        if (sortBy === 'rating') {
-          return b.rating - a.rating;
-        }
-        return 0;
+        return matchesDest && matchesCovered && matchesEV && matchesCCTV && matchesValet;
       });
-  }, [parkingLots, searchQuery, maxPrice, featuresFilter, sortBy]);
+  }, [parkingLots, destination, filters]);
 
-  const resetFilters = () => {
-    setMaxPrice(250);
-    setFeaturesFilter({
-      covered: false,
-      open: false,
-      evCharging: false,
-      cctv: false,
-      valet: false
-    });
-    setSearchQuery('');
-  };
+  // Map Pins Coordinates & Details (simulated Google Maps)
+  const mapPins = [
+    { name: 'City Mall Parking', x: '35%', y: '25%', slots: 6, price: '₹120', eta: '12 mins' },
+    { name: 'Metro Parking Zone', x: '55%', y: '45%', slots: 4, price: '₹80', eta: '6 mins' },
+    { name: 'Airport Parking Complex', x: '20%', y: '70%', slots: 5, price: '₹40', eta: '25 mins' },
+    { name: 'Hospital Parking', x: '75%', y: '30%', slots: 2, price: '₹90', eta: '14 mins' },
+    { name: 'Office complex Area', x: '45%', y: '65%', slots: 3, price: '₹180', eta: '8 mins' }
+  ];
 
   return (
-    <div className="relative min-h-screen bg-[#02040a] text-white">
-      {/* Background ambient light */}
-      <div className="absolute top-0 right-1/4 h-[500px] w-[500px] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-20 left-10 h-[400px] w-[400px] rounded-full bg-purple-600/5 blur-[100px] pointer-events-none" />
-
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 relative">
-        {/* Top Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/20 bg-blue-500/5 px-3 py-1 text-xs font-bold text-blue-400">
-              <Sparkles className="h-3.5 w-3.5" /> Direct Access Confirmed
-            </div>
-            <h1 className="font-outfit text-3xl font-extrabold tracking-tight sm:text-4xl">Find Parking Slots</h1>
-            <p className="text-sm text-gray-400">Discover and book premium parking spaces in your city instantly.</p>
-          </div>
-
-          {/* Sort Menu */}
-          <div className="flex items-center gap-3 self-start md:self-auto">
-            <div className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-4 py-2.5 shadow-lg">
-              <ArrowUpDown className="h-4 w-4 text-gray-400" />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="bg-transparent text-xs font-bold text-gray-300 outline-none cursor-pointer"
-              >
-                <option value="distance" className="bg-gray-950 text-white">Sort by Distance</option>
-                <option value="price" className="bg-gray-950 text-white">Sort by Price</option>
-                <option value="rating" className="bg-gray-950 text-white">Sort by Rating</option>
-              </select>
-            </div>
-
-            <button
-              onClick={() => setShowFiltersMobile(!showFiltersMobile)}
-              className="md:hidden flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-4 py-2.5 text-xs font-bold text-gray-300"
-            >
-              <SlidersHorizontal className="h-4 w-4" /> Filters
-            </button>
-          </div>
-        </div>
-
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <div className="min-h-screen bg-[#FAFAFA] text-gray-800 flex flex-col">
+      
+      {/* Top Search bar wrapper */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm relative z-10">
+        <div className="mx-auto max-w-7xl flex flex-col lg:flex-row gap-4 items-center justify-between">
           
-          {/* Sidebar Filters (Desktop) */}
-          <div className="hidden md:block lg:col-span-3 rounded-2xl border border-white/5 bg-white/[0.02] p-6 backdrop-blur-xl sticky top-28 shadow-xl">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-6">
-              <span className="font-bold text-sm text-white flex items-center gap-2">
-                <SlidersHorizontal className="h-4.5 w-4.5 text-blue-500" /> Search Filters
-              </span>
-              <button onClick={resetFilters} className="text-xs font-bold text-gray-400 hover:text-blue-400 transition-colors cursor-pointer">
-                Reset
-              </button>
-            </div>
-
-            {/* Search destination */}
-            <div className="space-y-2 mb-6">
-              <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Destination</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
-                <input
-                  type="text"
-                  placeholder="Search street, building..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-white/5 bg-[#02040a]/65 pl-10 pr-4 py-2.5 text-xs text-white placeholder-gray-500 focus:border-blue-500/60 focus:outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Price slider */}
-            <div className="space-y-3 mb-6">
-              <div className="flex items-center justify-between">
-                <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">Max Price / Hr</label>
-                <span className="text-xs font-mono font-bold text-blue-400 bg-blue-500/5 px-2 py-0.5 rounded border border-blue-500/10">₹{maxPrice}</span>
-              </div>
+          {/* Inputs Bar */}
+          <div className="w-full grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <div className="relative">
+              <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
               <input
-                type="range"
-                min="30"
-                max="300"
-                step="10"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(parseFloat(e.target.value))}
-                className="w-full h-1 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                type="text"
+                placeholder="Where are you going?"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                className="w-full rounded-xl border border-gray-300 bg-gray-50 pl-10 pr-4 py-2.5 text-xs text-gray-800 focus:outline-none focus:border-blue-500 focus:bg-white"
+              />
+            </div>
+            
+            <div className="relative">
+              <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full rounded-xl border border-gray-300 bg-gray-50 pl-10 pr-4 py-2.5 text-xs text-gray-800 focus:outline-none focus:border-blue-500 focus:bg-white"
               />
             </div>
 
-            {/* Features list */}
-            <div className="space-y-4">
-              <label className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 block">Amenities</label>
-              
-              <div className="space-y-3">
-                {[
-                  { key: 'covered', label: 'Covered Parking' },
-                  { key: 'open', label: 'Open Parking Lot' },
-                  { key: 'evCharging', label: 'EV Charging Station' },
-                  { key: 'cctv', label: 'CCTV Monitoring' },
-                  { key: 'valet', label: 'Valet Parking' }
-                ].map((item) => (
-                  <label key={item.key} className="flex items-center gap-3 cursor-pointer group text-xs text-gray-400 hover:text-white transition-colors">
-                    <input
-                      type="checkbox"
-                      checked={featuresFilter[item.key]}
-                      onChange={() => handleFeatureToggle(item.key)}
-                      className="h-4.5 w-4.5 rounded border-white/10 bg-white/[0.02] text-blue-600 focus:ring-0 cursor-pointer"
-                    />
-                    <span className="font-semibold">{item.label}</span>
-                  </label>
-                ))}
-              </div>
+            <div className="relative">
+              <Clock className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
+              <input
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="w-full rounded-xl border border-gray-300 bg-gray-50 pl-10 pr-4 py-2.5 text-xs text-gray-800 focus:outline-none focus:border-blue-500 focus:bg-white"
+              />
+            </div>
+
+            <div className="relative">
+              <Car className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" />
+              <select
+                value={vehicle}
+                onChange={(e) => setVehicle(e.target.value)}
+                className="w-full rounded-xl border border-gray-300 bg-gray-50 pl-10 pr-4 py-2.5 text-xs text-gray-800 focus:outline-none focus:border-blue-500 focus:bg-white cursor-pointer"
+              >
+                <option value="Sedan">Sedan</option>
+                <option value="SUV">SUV</option>
+                <option value="Hatchback">Hatchback</option>
+                <option value="EV-Charging">EV (Charging Slot)</option>
+              </select>
             </div>
           </div>
 
-          {/* Mobile Filters Panel */}
-          <AnimatePresence>
-            {showFiltersMobile && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="md:hidden rounded-2xl border border-white/5 bg-white/[0.02] p-5 mb-6 backdrop-blur-xl"
+          {/* Action Filters Trigger */}
+          <div className="flex gap-2 w-full lg:w-auto overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+            {[
+              { key: 'covered', label: 'Covered' },
+              { key: 'evCharging', label: 'EV Station' },
+              { key: 'cctv', label: 'CCTV Secure' },
+              { key: 'valet', label: 'Valet' }
+            ].map(f => (
+              <button
+                key={f.key}
+                onClick={() => toggleFilter(f.key)}
+                className={`px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border cursor-pointer ${
+                  filters[f.key]
+                    ? 'bg-blue-550 border-blue-600 text-white shadow-sm'
+                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                }`}
               >
-                <div className="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
-                  <span className="font-bold text-sm">Filters</span>
-                  <button onClick={resetFilters} className="text-xs font-bold text-gray-400">Reset</button>
-                </div>
+                {f.label}
+              </button>
+            ))}
+          </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Destination</label>
-                    <input
-                      type="text"
-                      placeholder="Search street, building..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full rounded-xl border border-white/5 bg-[#02040a]/65 px-4.5 py-2.5 text-xs text-white focus:outline-none mt-1"
-                    />
-                  </div>
+        </div>
+      </div>
 
-                  <div>
-                    <div className="flex justify-between">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Max Price</label>
-                      <span className="text-xs font-bold text-blue-450">₹{maxPrice}</span>
+      {/* Main split content */}
+      <div className="flex-1 flex flex-col md:flex-row relative">
+        
+        {/* Left Side: Parking Cards list */}
+        <div className="w-full md:w-[50%] p-6 overflow-y-auto max-h-[calc(100vh-8.5rem)] space-y-6">
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="font-outfit text-sm font-bold uppercase tracking-wider text-gray-500">
+              Verified Complexes ({filteredLots.length})
+            </h2>
+          </div>
+
+          {filteredLots.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-gray-300 p-12 text-center bg-white">
+              <p className="text-xs text-gray-400">No properties matched your search parameters.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {filteredLots.map(lot => {
+                const isSaved = savedLocations.includes(lot.id);
+                return (
+                  <div 
+                    key={lot.id}
+                    className="consumer-card p-4 flex flex-col sm:flex-row gap-5 hover:border-gray-300 hover:shadow-lg transition-all"
+                  >
+                    {/* Visual Card Image */}
+                    <div className="w-full sm:w-44 h-32 rounded-xl bg-gray-100 overflow-hidden relative shrink-0">
+                      <img
+                        src={lot.image}
+                        alt={lot.name}
+                        className="h-full w-full object-cover"
+                      />
+                      
+                      {/* Price tag overlay */}
+                      <div className="absolute bottom-2 left-2 rounded-lg bg-gray-950/80 px-2 py-1 text-[11px] font-bold text-white">
+                        ₹{lot.price}/hr
+                      </div>
                     </div>
-                    <input
-                      type="range"
-                      min="30"
-                      max="300"
-                      step="10"
-                      value={maxPrice}
-                      onChange={(e) => setMaxPrice(parseFloat(e.target.value))}
-                      className="w-full accent-blue-500 mt-1"
-                    />
-                  </div>
 
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {Object.keys(featuresFilter).map((f) => (
-                      <button
-                        key={f}
-                        onClick={() => handleFeatureToggle(f)}
-                        className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all ${
-                          featuresFilter[f] 
-                            ? 'bg-blue-600/10 text-blue-400 border-blue-500/30' 
-                            : 'border-white/5 bg-white/[0.02] text-gray-400'
-                        }`}
-                      >
-                        {f.charAt(0).toUpperCase() + f.slice(1).replace('Charging', ' Charging')}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Listings Grid */}
-          <div className="lg:col-span-9">
-            {filteredLots.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-white/10 bg-white/[0.01] p-16 text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.02] text-gray-500 mb-6 border border-white/5">
-                  <Car className="h-6 w-6" />
-                </div>
-                <h3 className="font-outfit text-lg font-bold text-white">No parking lots found</h3>
-                <p className="text-xs text-gray-500 max-w-sm mx-auto mt-2 leading-relaxed">
-                  We couldn't find any verified spaces matching your active filter settings. Try expanding your search pricing range or amenities.
-                </p>
-                <button
-                  onClick={resetFilters}
-                  className="mt-6 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/5 px-5 py-2.5 text-xs font-bold text-gray-300 hover:text-white transition-colors"
-                >
-                  Clear All Filters
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {filteredLots.map((lot, idx) => {
-                  const isSaved = savedLocations.includes(lot.id);
-                  return (
-                    <motion.div
-                      key={lot.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: idx * 0.05 }}
-                      className="group relative rounded-3xl border border-white/5 bg-white/[0.01] overflow-hidden flex flex-col justify-between hover:border-blue-500/25 transition-all duration-500 shadow-xl"
-                    >
-                      {/* Image & overlay info */}
-                      <div className="relative h-56 w-full bg-[#02040a] overflow-hidden">
-                        <img
-                          src={lot.image}
-                          alt={lot.name}
-                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#02040a] via-[#02040a]/40 to-transparent" />
-                        
-                        {/* Price Badge */}
-                        <div className="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-xl bg-gray-950/80 backdrop-blur-xl border border-white/10 px-3 py-1.5">
-                          <span className="text-sm font-extrabold text-white">₹{lot.price}</span>
-                          <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">/ hr</span>
+                    {/* Card Content details */}
+                    <div className="flex-1 flex flex-col justify-between">
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-outfit text-base font-bold text-gray-900 leading-tight">
+                            {lot.name}
+                          </h3>
+                          <div className="flex items-center gap-1 text-xs text-amber-500 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-100 shadow-sm shrink-0">
+                            <Star className="h-3.5 w-3.5 fill-amber-500" />
+                            <span>{lot.rating}</span>
+                          </div>
                         </div>
 
-                        {/* Distance Badge */}
-                        <div className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-xl bg-blue-600/90 backdrop-blur-xl border border-white/10 px-3 py-1.5 text-[10px] font-extrabold text-white tracking-widest uppercase">
-                          <Navigation className="h-3 w-3" /> {lot.distance}
-                        </div>
+                        <p className="text-xs text-gray-500 flex items-center gap-1">
+                          <MapPin className="h-3.5 w-3.5 text-gray-400" /> {lot.address}
+                        </p>
 
-                        {/* Starred Button */}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); toggleSaveLocation(lot.id); }}
-                          className="absolute top-4 right-4 rounded-xl bg-gray-950/60 p-2.5 text-gray-400 hover:text-rose-500 transition-colors border border-white/5 backdrop-blur-xl cursor-pointer"
-                        >
-                          <Heart className={`h-4.5 w-4.5 transition-colors ${isSaved ? 'fill-rose-500 text-rose-500' : ''}`} />
-                        </button>
+                        <div className="flex flex-wrap gap-1.5 pt-1 text-[9px] font-bold text-gray-500 uppercase">
+                          {lot.features.evCharging && <span className="bg-blue-50 border border-blue-100 px-2 py-0.5 rounded text-blue-600">EV Station</span>}
+                          {lot.features.cctv && <span className="bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded text-emerald-600">CCTV Secure</span>}
+                          {lot.features.valet && <span className="bg-gray-100 px-2 py-0.5 rounded">Valet</span>}
+                        </div>
                       </div>
 
-                      {/* Info details */}
-                      <div className="p-6 flex-1 flex flex-col justify-between">
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-outfit text-lg font-bold text-white group-hover:text-blue-450 transition-colors">
-                              {lot.name}
-                            </h3>
-                            <div className="flex items-center gap-1 text-xs text-amber-500 font-bold bg-amber-500/5 px-2 py-0.5 rounded border border-amber-500/10 shadow-sm">
-                              <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
-                              <span>{lot.rating}</span>
-                            </div>
-                          </div>
-
-                          <p className="text-xs text-gray-400 flex items-center gap-1.5">
-                            <MapPin className="h-4 w-4 text-gray-500 shrink-0" />
-                            <span className="truncate">{lot.address}</span>
-                          </p>
-
-                          {/* Amenity tags */}
-                          <div className="flex flex-wrap gap-2 pt-2">
-                            {lot.features.evCharging && (
-                              <span className="flex items-center gap-1 rounded-lg bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 text-[10px] font-bold text-blue-400">
-                                <Zap className="h-3 w-3" /> EV Charging
-                              </span>
-                            )}
-                            {lot.features.cctv && (
-                              <span className="flex items-center gap-1 rounded-lg bg-white/[0.02] border border-white/5 px-2.5 py-1 text-[10px] font-bold text-gray-400">
-                                <Shield className="h-3 w-3" /> CCTV Secure
-                              </span>
-                            )}
-                            {lot.features.valet && (
-                              <span className="flex items-center gap-1 rounded-lg bg-purple-500/10 border border-purple-500/20 px-2.5 py-1 text-[10px] font-bold text-purple-400">
-                                Valet
-                              </span>
-                            )}
-                          </div>
+                      {/* Action footer */}
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-4">
+                        <div className="text-[11px]">
+                          <span className="text-gray-400 block font-medium">Live Availability</span>
+                          <strong className="text-emerald-600 font-bold">{lot.availableSlotsCount} slots free</strong>
                         </div>
 
-                        {/* Bottom reservation section */}
-                        <div className="flex items-center justify-between border-t border-white/5 pt-5 mt-6">
-                          <div>
-                            <div className="text-[9px] font-extrabold uppercase tracking-wider text-gray-500">Live Capacity</div>
-                            <div className="flex items-center gap-1.5 mt-1">
-                              <span className={`h-2 w-2 rounded-full ${lot.availableSlotsCount > 3 ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
-                              <span className={`text-xs font-bold ${lot.availableSlotsCount > 3 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                                {lot.availableSlotsCount} slots left
-                              </span>
-                            </div>
-                          </div>
-
+                        <div className="flex items-center gap-2">
                           <button
                             onClick={() => navigate(`/parking/${lot.id}`)}
-                            className="flex items-center gap-1 rounded-xl bg-white/[0.02] border border-white/5 hover:border-blue-500/40 hover:bg-blue-600/15 hover:text-blue-400 px-4.5 py-2.5 text-xs font-extrabold text-gray-300 transition-all cursor-pointer"
+                            className="btn-consumer-primary px-4 py-2 text-xs font-bold rounded-lg shadow-sm"
                           >
-                            <span>Inspect Slots</span>
-                            <ChevronRight className="h-4 w-4" />
+                            <span>Inspect & Book</span>
                           </button>
                         </div>
                       </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
+        {/* Right Side: Map Experience */}
+        <div className="hidden md:block flex-1 bg-gray-200 relative border-l border-gray-200 overflow-hidden">
+          {/* Simulated Map Canvas */}
+          <div className="absolute inset-0 bg-neutral-100 bg-[linear-gradient(to_right,#e5e5e5_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e5_1px,transparent_1px)] bg-[size:30px_30px]" />
+          
+          {/* Drawing Simulated Roads */}
+          <div className="absolute top-1/3 left-0 right-0 h-10 bg-white border-y border-gray-300" />
+          <div className="absolute top-2/3 left-0 right-0 h-10 bg-white border-y border-gray-300" />
+          <div className="absolute top-0 bottom-0 left-1/4 w-10 bg-white border-x border-gray-300" />
+          <div className="absolute top-0 bottom-0 left-2/3 w-10 bg-white border-x border-gray-300" />
+
+          {/* Interactive Google Map Pins */}
+          {mapPins.map((pin, idx) => (
+            <motion.div
+              key={idx}
+              className="absolute map-pin-bounce"
+              style={{ left: pin.x, top: pin.y }}
+            >
+              <div className="relative group cursor-pointer">
+                {/* Pin element */}
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 border-2 border-white text-white shadow-lg">
+                  <Navigation className="h-3 w-3 stroke-[2.5]" />
+                </div>
+                
+                {/* Overlay Card Details */}
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-36 rounded-xl border border-gray-200 bg-white p-2.5 shadow-xl space-y-1.5 opacity-90 transition-opacity hover:opacity-100 z-10">
+                  <span className="font-outfit text-[10px] font-bold text-gray-900 block truncate">{pin.name}</span>
+                  <div className="flex justify-between items-center text-[9px] font-mono text-gray-500 font-bold border-t border-gray-100 pt-1">
+                    <span className="text-blue-600 font-bold">{pin.price}/hr</span>
+                    <span className="text-emerald-600">{pin.slots} free</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
 
       </div>

@@ -1,83 +1,101 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @import "tailwindcss";
 
 :root {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
   scroll-behavior: smooth;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #0A0A0A; /* Charcoal Black */
-  color: #F3F4F6; /* Soft Gray */
+  background-color: #FAFAFA; /* Soft White */
+  color: #1F2937; /* Charcoal Gray */
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Custom Minimal Scrollbar */
+/* Custom Consumer Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0A0A0A;
+  background: #F3F4F6;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #262626;
+  background: #D1D5DB;
   border-radius: 999px;
+  border: 2px solid #F3F4F6;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #404040;
+  background: #9CA3AF;
 }
 
-/* Premium Card Styles */
-.premium-card {
-  background-color: #121212;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+/* Premium Airbnb/Uber Shadows & Card Panels */
+.consumer-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.03), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  border-radius: 16px;
 }
 
-.premium-card-hover {
+.consumer-card-hover {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.premium-card-hover:hover {
-  border-color: rgba(255, 255, 255, 0.12);
-  background-color: #161616;
-  transform: translateY(-1px);
+.consumer-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  border-color: #D1D5DB;
 }
 
-/* Minimal Input */
-.premium-input {
-  background-color: #121212;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  color: #FFFFFF;
+/* Google Maps like Pin Glows */
+@keyframes pinBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.map-pin-bounce {
+  animation: pinBounce 2.5s infinite ease-in-out;
+}
+
+/* Inputs styling */
+.consumer-input {
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 12px;
+  color: #1F2937;
   font-size: 13px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
-.premium-input:focus {
+.consumer-input:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.2);
-  background-color: #141414;
+  border-color: #2563EB; /* Royal Blue */
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
-/* Apple/Stripe-like Minimal Buttons */
-.btn-premium {
-  background-color: #FFFFFF;
-  color: #0A0A0A;
-  font-weight: 500;
+/* Dynamic Buttons */
+.btn-consumer-primary {
+  background: #2563EB;
+  color: #FFFFFF;
+  font-weight: 600;
   font-size: 13px;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
@@ -85,19 +103,20 @@ body {
   cursor: pointer;
 }
 
-.btn-premium:hover {
-  background-color: #E5E7EB;
+.btn-consumer-primary:hover {
+  background: #1D4ED8;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
   transform: translateY(-0.5px);
 }
 
-.btn-ghost {
-  background-color: transparent;
-  color: #9CA3AF;
-  font-weight: 500;
+.btn-consumer-secondary {
+  background: #FFFFFF;
+  color: #4B5563;
+  font-weight: 600;
   font-size: 13px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 1px solid #D1D5DB;
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
@@ -105,54 +124,18 @@ body {
   cursor: pointer;
 }
 
-.btn-ghost:hover {
-  background-color: rgba(255, 255, 255, 0.03);
-  color: #FFFFFF;
-  border-color: rgba(255, 255, 255, 0.15);
+.btn-consumer-secondary:hover {
+  background: #F9FAFB;
+  color: #1F2937;
+  border-color: #9CA3AF;
+  transform: translateY(-0.5px);
 }
 
-/* Minimal badging */
-.badge-emerald {
-  background-color: rgba(15, 118, 110, 0.1);
-  border: 1px solid rgba(15, 118, 110, 0.2);
-  color: #0F766E;
-  font-weight: 600;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 3px 8px;
-  border-radius: 4px;
+/* Heatmap Grids */
+.heatmap-cell {
+  transition: background-color 0.3s ease;
 }
 
-.badge-muted {
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #9CA3AF;
-  font-weight: 600;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 3px 8px;
-  border-radius: 4px;
-}
-
-/* Premium Layouts */
-.border-titanium {
-  border-color: rgba(255, 255, 255, 0.05);
-}
-
-.bg-charcoal {
-  background-color: #0A0A0A;
-}
-
-.bg-graphite {
-  background-color: #121212;
-}
-
-.bg-light-graphite {
-  background-color: #161616;
-}
-
-.text-soft-gray {
-  color: #E5E7EB;
+.font-outfit {
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }

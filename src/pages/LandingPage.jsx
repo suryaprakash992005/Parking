@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Shield, CheckCircle2, Clock, Map, Star, ArrowRight,
-  TrendingUp, Award, Zap, DollarSign, Users, Building, ShieldCheck
+  TrendingUp, Award, Zap, DollarSign, Users, Building, ShieldCheck, Car
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
@@ -16,189 +16,251 @@ export default function LandingPage() {
     navigate('/owner-dashboard?tab=lots');
   };
 
+  // Simulated live reservation triggers
+  const [liveStats, setLiveStats] = useState({
+    bookingNow: 3,
+    available: 12,
+    occupied: 8
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveStats(prev => {
+        const delta = Math.random() > 0.5 ? 1 : -1;
+        const nextBooking = Math.max(1, Math.min(6, prev.bookingNow + delta));
+        const nextOccupied = Math.max(5, Math.min(12, prev.occupied - delta));
+        return {
+          bookingNow: nextBooking,
+          available: 20 - nextOccupied,
+          occupied: nextOccupied
+        };
+      });
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
   const steps = [
-    { number: '01', title: 'Target Destination', desc: 'Identify your target building or metropolitan street coordinates.' },
-    { number: '02', title: 'Real-Time Inventory', desc: 'Compare live space occupancy schedules and features.' },
-    { number: '03', title: 'Instant Verification', desc: 'Pre-book your spot and claim a cryptographically signed QR token.' },
-    { number: '04', title: 'Seamless Access', desc: 'Scan at the gate checkpoint and park without street cruising.' }
+    { number: '01', title: 'Find Location', desc: 'Search for verified parking complexes near your destination.' },
+    { number: '02', title: 'Compare Pricing', desc: 'Inspect live slot statuses, hourly rates, and amenities.' },
+    { number: '03', title: 'Lock Slot', desc: 'Book your spot in advance and secure a QR ticket pass.' },
+    { number: '04', title: 'Park Instantly', desc: 'Drive in, scan your ticket at the barrier, and park stress-free.' }
   ];
 
   const features = [
-    { icon: Clock, title: 'Optimized Time Allocation', desc: 'Eradicate street search congestion. Navigate directly to your dedicated bay.' },
-    { icon: TrendingUp, title: 'Traffic Management', desc: 'Mitigate city-wide gridlock and carbon emissions through predictive arrival mapping.' },
-    { icon: Shield, title: 'Secured Allocations', desc: 'Your parking slot is locked and monitored from the moment the payment is cleared.' },
-    { icon: Zap, title: 'Stripe-Integrated Payments', desc: 'Clear checkout payments under 15 seconds with enterprise grade encryption.' },
-    { icon: CheckCircle2, title: 'Telemetry Infrastructure', desc: 'Live spot status displays precisely which slots are vacant in real-time.' },
-    { icon: DollarSign, title: 'Asset Monetization', desc: 'Parking hosts list driveway space or commercial garages for secondary revenue.' }
+    { icon: Clock, title: 'Save Valuable Time', desc: 'Skip driving in circles. Go straight to your pre-reserved space.' },
+    { icon: TrendingUp, title: 'Avoid Traffic Knots', desc: 'Reduce central road gridlocks caused by drivers hunting for spots.' },
+    { icon: Shield, title: 'Guaranteed Availability', desc: 'Your designated bay is monitored and locked for your arrival.' },
+    { icon: Zap, title: '1-Click Booking Flow', desc: 'Reserve and checkout in seconds via our fast billing engine.' },
+    { icon: CheckCircle2, title: 'Live Slot Status', desc: 'Every slot has smart sensors reporting real-time vacancy updates.' },
+    { icon: DollarSign, title: 'Monetize Vacancy', desc: 'Property owners list spaces to capture passive daily income.' }
   ];
 
   const stats = [
-    { value: '20,000+', label: 'Verified Commuters', icon: Users },
-    { value: '5,000+', label: 'Configured Bays', icon: Map },
-    { value: '150+', label: 'Enterprise Partners', icon: Building }
+    { value: '20,000+', label: 'Happy Drivers', icon: Users, color: 'text-blue-600' },
+    { value: '5,000+', label: 'Smart Bays', icon: Map, color: 'text-emerald-600' },
+    { value: '150+', label: 'Parking Owners', icon: Building, color: 'text-amber-600' }
+  ];
+
+  // 20 realistic parking spaces mock
+  const parkingGrid = [
+    { label: 'P1', status: 'Occupied', type: 'Standard' },
+    { label: 'P2', status: 'Available', type: 'Standard' },
+    { label: 'P3', status: 'Reserved', type: 'EV-Charging' },
+    { label: 'P4', status: 'Occupied', type: 'Standard' },
+    { label: 'P5', status: 'Available', type: 'Premium' },
+    { label: 'P6', status: 'Available', type: 'Standard' },
+    { label: 'P7', status: 'Occupied', type: 'Standard' },
+    { label: 'P8', status: 'Reserved', type: 'Standard' },
+    { label: 'P9', status: 'Available', type: 'EV-Charging' },
+    { label: 'P10', status: 'Occupied', type: 'Premium' },
+    { label: 'P11', status: 'Available', type: 'Standard' },
+    { label: 'P12', status: 'Available', type: 'Standard' },
+    { label: 'P13', status: 'Occupied', type: 'Standard' },
+    { label: 'P14', status: 'Reserved', type: 'Standard' },
+    { label: 'P15', status: 'Available', type: 'EV-Charging' },
+    { label: 'P16', status: 'Occupied', type: 'Standard' },
+    { label: 'P17', status: 'Available', type: 'Standard' },
+    { label: 'P18', status: 'Available', type: 'Premium' },
+    { label: 'P19', status: 'Occupied', type: 'Standard' },
+    { label: 'P20', status: 'Reserved', type: 'Standard' }
   ];
 
   const testimonials = [
     {
       name: 'Sarah Jenkins',
-      role: 'Financial Director',
-      text: 'Integrating ParkEase into our downtown branch has streamlined mornings. Commuters navigate directly to their bays without street delays.',
+      role: 'Office Commuter',
+      text: 'I reserve my bay at Downtown Smart Haven every morning. I park within 30 seconds and walk to work. Game changer.',
+      rating: 5,
       avatar: 'SJ'
     },
     {
       name: 'Marcus Vance',
-      role: 'Estate Operations Manager',
-      text: 'Listing our commercial deck vacancy has opened secondary revenue flows. The dashboard telemetry is clean and highly functional.',
+      role: 'Property Owner',
+      text: 'Listing our excess garage slots has generated stable secondary income. The dashboard handles verification smoothly.',
+      rating: 5,
       avatar: 'MV'
     },
     {
       name: 'Elena Rostova',
-      role: 'Infrastructure Lead',
-      text: 'Specifically filtering for EV-configured slots has resolved our fleet charging challenges. Booking is simple and predictable.',
+      role: 'EV Commuter',
+      text: 'Knowing I have a reserved EV charging space locked in before driving downtown takes away all charging anxiety.',
+      rating: 5,
       avatar: 'ER'
     }
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#0A0A0A] overflow-hidden text-neutral-200">
+    <div className="relative min-h-screen bg-[#FAFAFA] text-gray-800">
       
-      {/* Subtle linear backdrop grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#141414_1px,transparent_1px),linear-gradient(to_bottom,#141414_1px,transparent_1px)] bg-[size:40px_40px] opacity-25" />
+      {/* Background visual texture */}
+      <div className="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-20 left-10 h-[400px] w-[400px] rounded-full bg-emerald-500/5 blur-[100px] pointer-events-none" />
 
       {/* Hero Section */}
-      <section className="relative mx-auto max-w-7xl px-6 pt-20 pb-24 sm:px-8 lg:pt-32">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16 items-center">
+      <section className="relative mx-auto max-w-7xl px-6 pt-16 pb-20 sm:px-8 lg:pt-24">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-12 items-center">
           
-          {/* Left Column */}
-          <div className="lg:col-span-6 space-y-8 text-left">
-            <div className="inline-flex items-center gap-2 rounded border border-neutral-800 bg-neutral-900/60 px-3.5 py-1 text-[10px] font-extrabold uppercase tracking-widest text-neutral-400">
-              <ShieldCheck className="h-3.5 w-3.5 text-neutral-400" /> Platform Infrastructure v2.0
+          {/* Left Column: Heading & CTAs */}
+          <div className="lg:col-span-6 space-y-6 text-left">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-150 px-3.5 py-1 text-xs font-bold text-blue-600 shadow-sm">
+              <ShieldCheck className="h-4 w-4" /> 100% Secure Reservations
             </div>
             
-            <h1 className="font-outfit text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-white leading-[1.08]">
-              Smart Parking Infrastructure For Modern Cities
+            <h1 className="font-outfit text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-gray-900 leading-[1.08]">
+              Find And Reserve Parking <span className="text-blue-600">Before</span> You Arrive
             </h1>
 
-            <p className="text-sm text-neutral-400 max-w-lg leading-relaxed">
-              Reserve secure parking spaces before arriving and eliminate unnecessary waiting. Integrate, book, and coordinate logistics from a single clean interface.
+            <p className="text-sm text-gray-500 max-w-lg leading-relaxed">
+              Locate nearby verified parking spaces, compare hourly prices, check real-time availability, and secure your spot instantly to beat the city rush.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
               <Link
                 to="/search"
-                className="rounded bg-white hover:bg-neutral-200 px-6 py-3.5 text-xs font-bold text-black text-center shadow-lg transition-all"
+                className="btn-consumer-primary px-6 py-3.5 shadow-lg shadow-blue-500/20 text-center"
               >
-                Book Parking Slot
+                <span>Find Parking Lot</span>
+                <ArrowRight className="h-4 w-4 ml-1.5" />
               </Link>
               <button
                 onClick={handleBecomePartner}
-                className="rounded border border-neutral-800 hover:border-neutral-750 bg-neutral-900/50 hover:bg-neutral-900 px-6 py-3.5 text-xs font-bold text-neutral-300 transition-all cursor-pointer"
+                className="btn-consumer-secondary px-6 py-3.5"
               >
-                Become Parking Partner
+                Become Parking Host
               </button>
             </div>
           </div>
 
-          {/* Right Column: Premium Dashboard Preview */}
-          <div className="lg:col-span-6 flex justify-center">
-            <motion.div 
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="relative w-full max-w-[520px] rounded-2xl border border-neutral-800 bg-neutral-950 p-6 flex flex-col justify-between overflow-hidden shadow-2xl"
-            >
-              <div className="flex items-center justify-between border-b border-neutral-900 pb-3 mb-4">
-                <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Console // Operations</span>
-                <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded">
-                  System Nominal
-                </span>
-              </div>
-
-              {/* Minimalist City Grid Map Illustration */}
-              <div className="h-48 w-full bg-neutral-900/40 rounded-xl border border-neutral-800/80 relative flex items-center justify-center overflow-hidden">
-                <svg className="absolute inset-0 h-full w-full opacity-30 stroke-neutral-800 stroke-[1]" fill="none">
-                  {/* Grid Lines */}
-                  <line x1="0" y1="40" x2="100%" y2="40" />
-                  <line x1="0" y1="80" x2="100%" y2="80" />
-                  <line x1="0" y1="120" x2="100%" y2="120" />
-                  <line x1="0" y1="160" x2="100%" y2="160" />
-                  <line x1="40" y1="0" x2="40" y2="100%" />
-                  <line x1="120" y1="0" x2="120" y2="100%" />
-                  <line x1="200" y1="0" x2="200" y2="100%" />
-                  <line x1="280" y1="0" x2="280" y2="100%" />
-                  <line x1="360" y1="0" x2="360" y2="100%" />
-                  {/* Diagonal connector lines */}
-                  <line x1="40" y1="40" x2="200" y2="120" stroke="rgba(255,255,255,0.05)" />
-                </svg>
-
-                {/* Simulated Target Points */}
-                <div className="absolute top-10 left-32 flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-neutral-600" />
-                  <span className="text-[9px] font-mono text-neutral-500">Node_01</span>
-                </div>
-                
-                <div className="absolute top-28 left-48 flex flex-col items-center">
-                  <span className="h-3 w-3 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20" />
-                  <span className="text-[9px] font-mono text-emerald-450 mt-1 font-bold">Bay A-04 (Reserved)</span>
-                </div>
-
-                <div className="absolute top-16 right-20 flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-neutral-600" />
-                  <span className="text-[9px] font-mono text-neutral-500">Node_02</span>
-                </div>
-              </div>
-
-              {/* Status details */}
-              <div className="grid grid-cols-3 gap-4 border-t border-neutral-900 pt-4 mt-4 text-xs font-mono">
+          {/* Right Column: Dynamic Live 20-Slot Visualizer */}
+          <div className="lg:col-span-6">
+            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-xl relative overflow-hidden">
+              
+              {/* Telemetry Header */}
+              <div className="flex justify-between items-center border-b border-gray-150 pb-4 mb-4">
                 <div>
-                  <div className="text-[8px] text-neutral-500 uppercase font-bold tracking-widest">Active Bay</div>
-                  <div className="text-white font-bold mt-0.5">A-04</div>
+                  <h3 className="font-outfit text-sm font-bold text-gray-950">Downtown Center Deck</h3>
+                  <div className="flex items-center gap-2 mt-1 text-[10px] font-bold text-gray-500 uppercase">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Live Operations Tracker</span>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-[8px] text-neutral-500 uppercase font-bold tracking-widest">Rate</div>
-                  <div className="text-white font-bold mt-0.5">₹120/hr</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-[8px] text-neutral-500 uppercase font-bold tracking-widest">Security</div>
-                  <div className="text-emerald-500 font-bold mt-0.5">Verified</div>
+
+                {/* Counters */}
+                <div className="flex gap-4 text-right text-xs">
+                  <div>
+                    <span className="text-[9px] text-gray-400 font-bold uppercase block">Available</span>
+                    <strong className="text-emerald-600 font-bold font-mono">{liveStats.available} bays</strong>
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-gray-400 font-bold uppercase block">Live Booking</span>
+                    <strong className="text-blue-600 font-bold font-mono">{liveStats.bookingNow} users</strong>
+                  </div>
                 </div>
               </div>
-            </motion.div>
+
+              {/* 20-Space Layout Grid */}
+              <div className="grid grid-cols-5 gap-3 pt-2">
+                {parkingGrid.map((slot, idx) => {
+                  const isOccupied = slot.status === 'Occupied';
+                  const isReserved = slot.status === 'Reserved';
+                  const isPremium = slot.type === 'Premium';
+                  const isEV = slot.type === 'EV-Charging';
+
+                  let statusColor = 'border-emerald-300 bg-emerald-50 text-emerald-600';
+                  let statusLabel = 'FREE';
+
+                  if (isOccupied) {
+                    statusColor = 'border-rose-250 bg-rose-50 text-rose-500';
+                    statusLabel = 'BUSY';
+                  } else if (isReserved) {
+                    statusColor = 'border-blue-300 bg-blue-50 text-blue-600';
+                    statusLabel = 'BOOKED';
+                  } else if (isPremium) {
+                    statusColor = 'border-amber-300 bg-amber-50 text-amber-600';
+                    statusLabel = 'VIP';
+                  }
+
+                  return (
+                    <div 
+                      key={idx}
+                      className={`h-14 rounded-xl border flex flex-col items-center justify-between p-1.5 font-mono text-[10px] shadow-sm ${statusColor}`}
+                    >
+                      <div className="flex justify-between w-full font-bold">
+                        <span>{slot.label}</span>
+                        {isEV && <span className="text-[8px] bg-blue-200/50 px-1 rounded">EV</span>}
+                      </div>
+
+                      <div className="text-[8px] font-extrabold tracking-wider">{statusLabel}</div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Legend indicators */}
+              <div className="mt-5 border-t border-gray-150 pt-4 flex justify-around text-[9px] font-bold text-gray-400 uppercase">
+                <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded bg-emerald-500" /> Free</span>
+                <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded bg-rose-500" /> Busy</span>
+                <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded bg-blue-500" /> Booked</span>
+                <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded bg-amber-500" /> VIP</span>
+              </div>
+
+            </div>
           </div>
+
         </div>
       </section>
 
       {/* How it works */}
-      <section className="mx-auto max-w-7xl px-6 py-24 sm:px-8 border-t border-neutral-900 bg-neutral-950/40">
-        <div className="text-left max-w-2xl mb-16 space-y-2">
-          <h2 className="font-outfit text-2xl font-bold tracking-tight text-white sm:text-3xl">System Methodology</h2>
-          <p className="text-neutral-400 text-xs leading-relaxed">
-            Four simple steps to transition from street cruising to structured parking arrivals.
+      <section className="mx-auto max-w-7xl px-6 py-20 sm:px-8 border-y border-gray-200 bg-gray-50">
+        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+          <h2 className="font-outfit text-3xl font-extrabold text-gray-900 tracking-tight">How It Works</h2>
+          <p className="text-gray-500 text-sm">
+            Eradicating parking stress in four straightforward steps.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, idx) => (
             <div 
               key={idx}
-              className="p-6 rounded-xl border border-neutral-900 bg-neutral-950/20 hover:border-neutral-800 transition-all duration-300 group"
+              className="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow group"
             >
-              <div className="text-xs font-mono font-bold text-neutral-600 mb-4 tracking-widest">
-                STAGE_0{idx + 1}
+              <div className="text-3xl font-extrabold text-blue-600/20 font-outfit mb-4 group-hover:text-blue-600 transition-colors">
+                {step.number}
               </div>
-              <h3 className="text-xs font-bold text-white mb-2 uppercase tracking-wider">{step.title}</h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">{step.desc}</p>
+              <h3 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wider">{step.title}</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Why Choose ParkEase */}
-      <section className="mx-auto max-w-7xl px-6 py-24 sm:px-8">
-        <div className="text-left max-w-2xl mb-16 space-y-2">
-          <h2 className="font-outfit text-2xl font-bold tracking-tight text-white sm:text-3xl">Operational Efficiency</h2>
-          <p className="text-neutral-400 text-xs leading-relaxed">
-            Features engineered to optimize spatial utility and time resources.
+      <section className="mx-auto max-w-7xl px-6 py-20 sm:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+          <h2 className="font-outfit text-3xl font-extrabold text-gray-900 tracking-tight">Why Choose ParkEase</h2>
+          <p className="text-gray-500 text-sm">
+            Premium utility features designed for optimal city driving experience.
           </p>
         </div>
 
@@ -208,13 +270,13 @@ export default function LandingPage() {
             return (
               <div 
                 key={idx}
-                className="p-6 rounded-xl border border-neutral-900 bg-neutral-950 hover:border-neutral-850 hover:bg-neutral-900/10 transition-all duration-300 group"
+                className="p-6 rounded-2xl border border-gray-200 bg-white hover:border-gray-300 transition-all shadow-sm"
               >
-                <div className="h-9 w-9 rounded bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400 mb-4">
-                  <Icon className="h-4.5 w-4.5" />
+                <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 mb-4">
+                  <Icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-xs font-bold text-white mb-2 uppercase tracking-wider">{feature.title}</h3>
-                <p className="text-xs text-neutral-400 leading-relaxed">{feature.desc}</p>
+                <h3 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wider">{feature.title}</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">{feature.desc}</p>
               </div>
             );
           })}
@@ -222,21 +284,21 @@ export default function LandingPage() {
       </section>
 
       {/* Live Statistics Section */}
-      <section className="mx-auto max-w-7xl px-6 py-16 sm:px-8 bg-neutral-950/80 border border-neutral-900 rounded-2xl my-8">
+      <section className="mx-auto max-w-7xl px-6 py-16 sm:px-8 bg-white border border-gray-200 rounded-3xl my-8 shadow-sm">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3 text-center">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (
               <div key={idx} className="space-y-2">
                 <div className="flex justify-center">
-                  <div className="p-2 rounded bg-neutral-900 border border-neutral-800 text-neutral-400">
-                    <Icon className="h-5 w-5" />
+                  <div className={`p-2.5 rounded-xl bg-gray-50 border border-gray-150 ${stat.color}`}>
+                    <Icon className="h-6 w-6" />
                   </div>
                 </div>
-                <div className="text-3xl font-extrabold text-white tracking-tight font-outfit">
+                <div className="text-4xl font-extrabold text-gray-950 tracking-tight font-outfit">
                   {stat.value}
                 </div>
-                <div className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">{stat.label}</div>
+                <div className="text-[10px] text-gray-400 font-extrabold uppercase tracking-wider">{stat.label}</div>
               </div>
             );
           })}
@@ -244,31 +306,38 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="mx-auto max-w-7xl px-6 py-24 sm:px-8 border-t border-neutral-900">
-        <div className="text-left max-w-2xl mb-16 space-y-2">
-          <h2 className="font-outfit text-2xl font-bold tracking-tight text-white sm:text-3xl">Corporate Feedback</h2>
-          <p className="text-neutral-400 text-xs leading-relaxed">
-            Reviews from enterprise facility coordinators and fleet operators.
+      <section className="mx-auto max-w-7xl px-6 py-20 sm:px-8 border-t border-gray-200">
+        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+          <h2 className="font-outfit text-3xl font-extrabold text-gray-900 tracking-tight">Driver Testimonials</h2>
+          <p className="text-gray-500 text-sm">
+            Read experience reports from commuters who park in our verified complexes.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {testimonials.map((test, idx) => (
             <div 
               key={idx}
-              className="p-6 rounded-xl border border-neutral-900 bg-neutral-950/20 flex flex-col justify-between"
+              className="p-6 rounded-2xl border border-gray-250 bg-white flex flex-col justify-between shadow-sm"
             >
-              <p className="text-xs text-neutral-300 italic leading-relaxed">
-                "{test.text}"
-              </p>
+              <div className="space-y-4">
+                <div className="flex gap-1 text-amber-500">
+                  {Array.from({ length: test.rating }).map((_, i) => (
+                    <Star key={i} className="h-4.5 w-4.5 fill-amber-500 text-amber-500" />
+                  ))}
+                </div>
+                <p className="text-xs text-gray-600 italic leading-relaxed">
+                  "{test.text}"
+                </p>
+              </div>
 
-              <div className="flex items-center gap-3 mt-6 border-t border-neutral-900 pt-4">
-                <div className="flex h-8 w-8 items-center justify-center rounded bg-neutral-900 border border-neutral-800 text-xs font-bold text-neutral-400">
+              <div className="flex items-center gap-3 mt-6 border-t border-gray-100 pt-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded bg-gray-50 border border-gray-200 text-xs font-bold text-gray-500">
                   {test.avatar}
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">{test.name}</h4>
-                  <p className="text-[10px] text-neutral-500">{test.role}</p>
+                  <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">{test.name}</h4>
+                  <p className="text-[10px] text-gray-500">{test.role}</p>
                 </div>
               </div>
             </div>
